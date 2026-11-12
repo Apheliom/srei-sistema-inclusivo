@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>SREI - Gestión de Docentes</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1E3A8A',
+              navyDark: '#172554',
+              blue: '#3B82F6',
+              green: '#10B981',
+              light: '#F8FAFC',
+              dark: '#1E293B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-brand-dark min-h-screen flex flex-col antialiased">
+
+  <!-- 1. Cabecera Institucional con Navegación Superior -->
+  <header class="bg-[#1E3A8A] text-white shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      
+      <!-- Marca -->
+      <div class="flex items-center gap-3">
+        <a href="/docentes.html" class="flex items-center gap-2.5 hover:opacity-95">
+          <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+            <img src="/assets/srei-logo.png" alt="SREI" class="w-7 h-7 object-contain">
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
+            <span class="text-[10px] sm:text-[11px] text-white/80 font-medium hidden xs:block">Educación Inclusiva</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navegación entre Módulos desde la Barra Superior -->
+      <nav class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+        <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">school</span>
+          <span>Estudiantes</span>
+        </a>
+        <a href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">badge</span>
+          <span>Docentes</span>
+        </a>
+      </nav>
+
+      <!-- Usuario Directora -->
+      <div class="flex items-center gap-2 pl-2 border-l border-white/20">
+        <div class="flex flex-col text-right hidden sm:flex">
+          <span class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
+          <span class="text-[10px] text-emerald-300 font-semibold">Directora del Servicio Especial de Educación Inclusiva</span>
+        </div>
+        <span class="sm:hidden bg-[#10B981] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Directora</span>
+        <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="Cerrar sesión">
+          <span class="material-symbols-outlined text-base">logout</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 2. Contenido Principal: Gestión de Docentes -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-5">
+
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6 flex flex-col gap-4">
+      
+      <!-- Cabecera de la Página -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-[#1E3A8A] tracking-tight flex items-center gap-2">
+            <span class="material-symbols-outlined text-2xl text-amber-600">manage_accounts</span>
+            Gestión y Aprobación de Docentes
+          </h2>
+          <p class="text-xs text-slate-500">Supervisión de cuentas de profesores y control de autorizaciones de la Dirección.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="relative w-full sm:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">search</span>
+            <input type="text" id="searchDocente" placeholder="Buscar por nombre o correo..." class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA MÓVIL: Tarjetas de Docentes (< 768px) -->
+      <div id="mobileDocentesContainer" class="flex flex-col gap-3 md:hidden"></div>
+
+      <!-- VISTA ESCRITORIO: Tabla de Docentes (>= 768px) -->
+      <div class="hidden md:block border border-slate-200/90 rounded-xl overflow-hidden overflow-x-auto shadow-xs">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-[#1E3A8A] font-bold uppercase tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-4">Docente</th>
+              <th class="py-3 px-4">Correo Institucional</th>
+              <th class="py-3 px-4">Estado de Cuenta</th>
+              <th class="py-3 px-4 text-center">Acción de la Dirección</th>
+            </tr>
+          </thead>
+          <tbody id="desktopDocentesTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+        </table>
+      </div>
+
+      <div id="emptyNoticeDocentes" class="hidden p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-500 text-xs">
+        No se encontraron docentes registrados con ese criterio.
+      </div>
+
+    </div>
+
+    <!-- 3. SECCIÓN INFERIOR: MÉTRICAS DE DOCENTES (ACTIVOS, INACTIVOS, PENDIENTES) -->
+    <section class="mt-auto pt-2">
+      <div class="mb-2.5 flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">pie_chart</span> Estado del Personal Docente
+        </h3>
+        <span class="text-[11px] text-slate-400">Actualizado en tiempo real</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <!-- Docentes Activos -->
+        <div class="bg-white p-3.5 rounded-xl shadow-xs border border-slate-200/80 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">verified</span>
+          </div>
+          <div>
+            <div id="statDocentesActivos" class="text-lg sm:text-2xl font-extrabold text-emerald-600">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Docentes Activos</div>
+          </div>
+        </div>
+
+        <!-- Docentes Inactivos -->
+        <div class="bg-white p-3.5 rounded-xl shadow-xs border border-slate-200/80 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">block</span>
+          </div>
+          <div>
+            <div id="statDocentesInactivos" class="text-lg sm:text-2xl font-extrabold text-slate-700">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Docentes Inactivos</div>
+          </div>
+        </div>
+
+        <!-- Docentes Pendientes de Aprobación -->
+        <div class="bg-white p-3.5 rounded-xl shadow-xs border border-slate-200/80 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">hourglass_empty</span>
+          </div>
+          <div>
+            <div id="statDocentesPendientes" class="text-lg sm:text-2xl font-extrabold text-amber-600">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Por Aprobar</div>
+          </div>
+        </div>
+
+        <!-- Total Docentes -->
+        <div class="bg-white p-3.5 rounded-xl shadow-xs border border-slate-200/80 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#1E3A8A] flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">badge</span>
+          </div>
+          <div>
+            <div id="statDocentesTotal" class="text-lg sm:text-2xl font-extrabold text-[#1E3A8A]">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Total Profesores</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="w-full bg-white border-t border-slate-200/80 py-3 px-4 text-center text-xs text-slate-500 mt-auto">
+    &copy; 2025 SREI &bull; Sistema de Registro Estudiantil Inclusivo
+  </footer>
+
+  <script>
+    (function () {
+      let docentesList = [];
+
+      const stored = sessionStorage.getItem('srei_user');
+      if (!stored) {
+        window.location.href = '/login.html';
+        return;
+      }
+      const currentUser = JSON.parse(stored);
+      if (currentUser.rol !== 'admin') {
+        alert('Acceso restringido: Se requiere rol de Director(a).');
+        window.location.href = '/';
+        return;
+      }
+
+      document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+        sessionStorage.removeItem('srei_user');
+        window.location.href = '/login.html';
+      });
+
+      const searchDocente = document.getElementById('searchDocente');
+      const mobileDocentesContainer = document.getElementById('mobileDocentesContainer');
+      const desktopDocentesTableBody = document.getElementById('desktopDocentesTableBody');
+      const emptyNoticeDocentes = document.getElementById('emptyNoticeDocentes');
+
+      async function loadStats() {
+        try {
+          const res = await fetch('/api/stats');
+          const json = await res.json();
+          if (json.success) {
+            document.getElementById('statDocentesActivos').textContent = json.data.docentesActivos;
+            document.getElementById('statDocentesInactivos').textContent = json.data.docentesInactivos;
+            document.getElementById('statDocentesPendientes').textContent = json.data.docentesPendientes;
+            document.getElementById('statDocentesTotal').textContent = json.data.docentesTotal;
+          }
+        } catch (e) { console.error(e); }
+      }
+
+      async function loadDocentes() {
+        try {
+          const res = await fetch('/api/admin/profesores');
+          const json = await res.json();
+          if (json.success) {
+            docentesList = json.data;
+            renderDocentes(docentesList);
+          }
+        } catch (e) { console.error(e); }
+      }
+
+      function getStatusBadge(estado) {
+        if (estado === 'activo') {
+          return '<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-bold">✓ Activo</span>';
+        }
+        if (estado === 'pendiente_aprobacion') {
+          return '<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[11px] font-bold">⏳ Pendiente Aprobación</span>';
+        }
+        return '<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[11px] font-bold">✕ Inactivo</span>';
+      }
+
+      function renderDocentes(list) {
+        if (list.length === 0) {
+          mobileDocentesContainer.innerHTML = '';
+          desktopDocentesTableBody.innerHTML = '';
+          emptyNoticeDocentes.classList.remove('hidden');
+          return;
+        }
+        emptyNoticeDocentes.classList.add('hidden');
+
+        // Móvil
+        mobileDocentesContainer.innerHTML = list.map(t => {
+          const btn = t.estado === 'activo'
+            ? `<button onclick="cambiarEstadoDocente(${t.id}, 'inactivo')" class="w-full py-1.5 px-3 text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg">Desactivar Acceso</button>`
+            : `<button onclick="cambiarEstadoDocente(${t.id}, 'activo')" class="w-full py-1.5 px-3 text-xs font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-lg shadow-xs">✓ Aprobar y Activar Cuenta</button>`;
+
+          return `
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col gap-2">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="font-bold text-slate-900 text-sm">${escapeHtml(t.nombre_completo)}</h4>
+                  <div class="text-xs text-slate-500">${escapeHtml(t.email)}</div>
+                </div>
+                ${getStatusBadge(t.estado)}
+              </div>
+              <div class="pt-2 border-t border-slate-100 mt-1">
+                ${btn}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Desktop
+        desktopDocentesTableBody.innerHTML = list.map(t => {
+          const btn = t.estado === 'activo'
+            ? `<button onclick="cambiarEstadoDocente(${t.id}, 'inactivo')" class="px-3 py-1.5 text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg transition-colors">Desactivar</button>`
+            : `<button onclick="cambiarEstadoDocente(${t.id}, 'activo')" class="px-3 py-1.5 text-xs font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-lg shadow-xs transition-colors">✓ Aprobar Cuenta</button>`;
+
+          return `
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="py-3 px-4 font-bold text-[#1E3A8A] text-xs sm:text-sm">${escapeHtml(t.nombre_completo)}</td>
+              <td class="py-3 px-4 text-slate-600 text-xs sm:text-sm font-mono">${escapeHtml(t.email)}</td>
+              <td class="py-3 px-4">${getStatusBadge(t.estado)}</td>
+              <td class="py-3 px-4 text-center">${btn}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function filterDocentes() {
+        const q = searchDocente.value.toLowerCase().trim();
+        const filtered = docentesList.filter(t => 
+          !q || t.nombre_completo.toLowerCase().includes(q) || t.email.toLowerCase().includes(q)
+        );
+        renderDocentes(filtered);
+      }
+
+      searchDocente.addEventListener('input', filterDocentes);
+
+      window.cambiarEstadoDocente = async function(id, estado) {
+        try {
+          const res = await fetch(`/api/admin/profesores/${id}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado, adminId: currentUser.id })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert(data.message);
+            loadDocentes();
+            loadStats();
+          }
+        } catch { alert('Error al actualizar estado'); }
+      };
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      loadStats();
+      loadDocentes();
+    })();
+  </script>
+</body>
+</html>
+

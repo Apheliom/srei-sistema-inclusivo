@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>SREI - Iniciar Sesión y Registro Docente</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1E3A8A',
+              navyDark: '#172554',
+              blue: '#3B82F6',
+              green: '#10B981',
+              light: '#F8FAFC',
+              dark: '#1E293B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body.high-contrast {
+      background-color: #000000 !important;
+      color: #FFFFFF !important;
+    }
+    body.high-contrast header,
+    body.high-contrast footer,
+    body.high-contrast .bg-white {
+      background-color: #121212 !important;
+      color: #FFFFFF !important;
+      border-color: #FFFFFF !important;
+    }
+    body.high-contrast h2,
+    body.high-contrast .text-brand-navy {
+      color: #FACC15 !important;
+    }
+  </style>
+</head>
+<body class="bg-brand-light font-sans text-brand-dark min-h-screen flex flex-col relative antialiased selection:bg-brand-blue selection:text-white">
+
+  <!-- Fondo Translúcido Suave -->
+  <div aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <img alt="" class="w-full h-full object-cover object-center opacity-25 select-none filter blur-[0.5px]" src="/assets/bg-translucent.jpg">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/90 via-[#F8FAFC]/80 to-[#F8FAFC]/95 backdrop-blur-[1px]"></div>
+  </div>
+
+  <!-- Barra Superior Limpia -->
+  <header class="w-full bg-[#1E3A8A] text-white shadow-sm z-40 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2.5 hover:opacity-95 transition-opacity">
+        <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+          <img src="/assets/srei-logo.png" alt="SREI" class="w-7 h-7 object-contain">
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
+          <span class="text-[10px] sm:text-[11px] text-white/80 font-medium">Educación Inclusiva</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-xs font-semibold text-white/90 hover:text-white flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-lg border border-white/20 transition-all">
+          <span class="material-symbols-outlined text-sm">arrow_back</span> Inicio
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tarjeta Central de Autenticación (Estilizada y Libre de Ruido Visual) -->
+  <main class="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 max-w-md mx-auto w-full relative z-10">
+    <div class="w-full bg-white rounded-2xl shadow-lg border border-slate-200/80 p-6 sm:p-8 transition-all">
+      
+      <!-- Encabezado de la Tarjeta -->
+      <div class="flex flex-col items-center text-center mb-5">
+        <div class="w-16 h-16 rounded-2xl bg-slate-50 p-2 shadow-xs border border-slate-200/80 flex items-center justify-center mb-3">
+          <img src="/assets/srei-logo.png" alt="SREI" class="w-12 h-12 object-contain mix-blend-multiply">
+        </div>
+        <h2 id="cardTitle" class="text-xl sm:text-2xl font-bold text-[#1E3A8A] tracking-tight">Acceso Institucional</h2>
+        <p id="cardSubtitle" class="text-xs text-slate-500 mt-0.5">Sistema de Registro Estudiantil Inclusivo (SREI)</p>
+      </div>
+
+      <!-- Segmented Control de Pestañas (Moderno y Touch-friendly) -->
+      <div class="bg-slate-100 p-1 rounded-xl flex mb-5 border border-slate-200/60" role="tablist">
+        <button id="tabLogin" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-white text-[#1E3A8A] shadow-xs transition-all cursor-pointer" type="button">
+          Iniciar Sesión
+        </button>
+        <button id="tabRegister" class="flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer" type="button">
+          Crear Cuenta Docente
+        </button>
+      </div>
+
+      <!-- FORMULARIO 1: INICIAR SESIÓN -->
+      <form id="loginForm" class="flex flex-col gap-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="loginEmail">
+            Correo o Usuario
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-lg">mail</span>
+            <input id="loginEmail" type="email" required placeholder="director@srei.edu o profesor@srei.edu" class="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] bg-slate-50/50">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="loginPassword">
+            Contraseña
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-lg">lock</span>
+            <input id="loginPassword" type="password" required placeholder="••••••••" class="w-full pl-9 pr-10 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] bg-slate-50/50">
+            <button type="button" id="toggleLoginPass" class="absolute right-3 text-slate-400 hover:text-slate-600">
+              <span class="material-symbols-outlined text-lg" id="loginEyeIcon">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full mt-2 py-3 px-4 rounded-xl font-bold text-white bg-[#10B981] hover:bg-emerald-600 shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] text-sm">
+          <span>Ingresar a la Plataforma</span>
+          <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+
+        <div class="pt-2 text-center">
+          <p class="text-[11px] text-slate-500">
+            <strong>Director:</strong> <code>director@srei.edu</code> (Clave: <code>Admin123*</code>)
+          </p>
+        </div>
+      </form>
+
+      <!-- FORMULARIO 2: REGISTRO DE PROFESOR -->
+      <form id="registerForm" class="hidden flex flex-col gap-3">
+        <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200/80 text-[11px] text-emerald-900 leading-snug">
+          Registro exclusivo para profesores. Requiere código de verificación y posterior activación de la Dirección.
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regNombre">Nombre Completo *</label>
+          <input id="regNombre" type="text" required placeholder="Ej. Profa. Ana Martínez" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regEmail">Correo Institucional *</label>
+          <input id="regEmail" type="email" required placeholder="profesor@escuela.edu" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regPass">Contraseña *</label>
+          <div class="relative">
+            <input id="regPass" type="password" required placeholder="Ingresa tu contraseña" class="w-full px-3 py-2 pr-10 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+            <button type="button" id="toggleRegPass" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer">
+              <span id="regEyeIcon" class="material-symbols-outlined text-base">visibility</span>
+            </button>
+          </div>
+          
+          <!-- Requisitos de Contraseña Dinámicos en Verde -->
+          <div class="mt-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] space-y-1">
+            <div class="font-bold text-slate-600 mb-1">Requisitos de la contraseña:</div>
+            <div id="reqLength" class="flex items-center gap-1.5 text-slate-400 font-medium transition-colors">
+              <span class="material-symbols-outlined text-[13px]">radio_button_unchecked</span> Al menos 8 caracteres
+            </div>
+            <div id="reqUpper" class="flex items-center gap-1.5 text-slate-400 font-medium transition-colors">
+              <span class="material-symbols-outlined text-[13px]">radio_button_unchecked</span> Al menos una letra mayúscula
+            </div>
+            <div id="reqNumber" class="flex items-center gap-1.5 text-slate-400 font-medium transition-colors">
+              <span class="material-symbols-outlined text-[13px]">radio_button_unchecked</span> Al menos un número
+            </div>
+            <div id="reqSpecial" class="flex items-center gap-1.5 text-slate-400 font-medium transition-colors">
+              <span class="material-symbols-outlined text-[13px]">radio_button_unchecked</span> Al menos un carácter especial (*, @, #, !, etc.)
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="regPassConfirm">Confirmar Contraseña *</label>
+          <div class="relative">
+            <input id="regPassConfirm" type="password" required placeholder="Repite la contraseña" class="w-full px-3 py-2 pr-10 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+            <button type="button" id="toggleRegPassConfirm" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer">
+              <span id="regConfirmEyeIcon" class="material-symbols-outlined text-base">visibility</span>
+            </button>
+          </div>
+          <p id="passMismatch" class="hidden text-xs text-red-500 mt-1">Las contraseñas no coinciden.</p>
+        </div>
+
+        <button type="submit" class="w-full mt-2 py-3 px-4 rounded-xl font-bold text-white bg-[#1E3A8A] hover:bg-blue-900 shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] text-sm">
+          <span>Registrar y Enviar Código</span>
+          <span class="material-symbols-outlined text-lg">forward_to_inbox</span>
+        </button>
+      </form>
+
+      <!-- PASO 3: VERIFICACIÓN DEL CÓDIGO -->
+      <div id="verifyStep" class="hidden flex flex-col gap-3.5 text-center">
+        <div class="w-12 h-12 bg-blue-100 text-[#1E3A8A] rounded-full flex items-center justify-center mx-auto">
+          <span class="material-symbols-outlined text-2xl">mark_email_read</span>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-[#1E3A8A]">Código de Verificación</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Enviado a: <strong id="verifyEmailDisplay" class="text-slate-800"></strong></p>
+        </div>
+
+        <div id="debugCodeNotice" class="hidden p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
+          Código generado: <strong id="debugCodeVal" class="text-sm font-mono tracking-widest text-[#1E3A8A]"></strong>
+        </div>
+
+        <div>
+          <input id="inputCode" type="text" maxlength="6" pattern="[0-9]{6}" required placeholder="123456" class="w-full text-center tracking-widest text-2xl font-bold py-2 border-2 border-[#1E3A8A] rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+        </div>
+
+        <button id="btnConfirmCode" type="button" class="w-full py-2.5 px-4 rounded-xl font-bold text-white bg-[#10B981] hover:bg-emerald-600 shadow transition-all text-sm">
+          Validar Código
+        </button>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+          <button id="btnResendCode" type="button" class="text-[#3B82F6] hover:underline font-semibold">Reenviar código</button>
+          <button id="btnBackToLogin" type="button" class="text-slate-500 hover:underline">Volver</button>
+        </div>
+      </div>
+
+      <!-- PASO 4: VISTA DE ESPERA DE APROBACIÓN -->
+      <div id="pendingApprovalView" class="hidden flex flex-col gap-3 text-center p-1">
+        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto">
+          <span class="material-symbols-outlined text-2xl">hourglass_top</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-[#1E3A8A]">Cuenta en Espera de Aprobación</h3>
+          <p class="text-xs text-slate-600 mt-1">
+            Hola <strong id="pendingTeacherName" class="text-slate-800">Docente</strong>. Tu correo ha sido validado exitosamente.
+          </p>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 text-left">
+          El <strong>Director del plantel escolar debe activar tu cuenta</strong> antes de que puedas acceder a registrar y gestionar expedientes.
+        </div>
+        <button onclick="window.location.href='/'" class="w-full py-2.5 px-4 rounded-xl font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 text-xs">
+          Volver al Inicio
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="w-full bg-white/95 backdrop-blur-sm border-t border-slate-200/90 py-3 px-4 text-center text-xs text-slate-500 relative z-10 mt-auto">
+    &copy; 2025 SREI &bull; Sistema de Registro Estudiantil Inclusivo
+  </footer>
+
+  <script>
+    (function () {
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const verifyStep = document.getElementById('verifyStep');
+      const pendingApprovalView = document.getElementById('pendingApprovalView');
+      const cardTitle = document.getElementById('cardTitle');
+
+      const toggleLoginPass = document.getElementById('toggleLoginPass');
+      const loginPassword = document.getElementById('loginPassword');
+      const loginEyeIcon = document.getElementById('loginEyeIcon');
+
+      let pendingEmail = '';
+
+      if (window.location.hash === '#registro') {
+        showRegisterTab();
+      }
+
+      function showLoginTab() {
+        tabLogin.className = 'flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-white text-[#1E3A8A] shadow-xs transition-all cursor-pointer';
+        tabRegister.className = 'flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        verifyStep.classList.add('hidden');
+        pendingApprovalView.classList.add('hidden');
+        cardTitle.textContent = 'Acceso Institucional';
+      }
+
+      function showRegisterTab() {
+        tabRegister.className = 'flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-white text-[#1E3A8A] shadow-xs transition-all cursor-pointer';
+        tabLogin.className = 'flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+        verifyStep.classList.add('hidden');
+        pendingApprovalView.classList.add('hidden');
+        cardTitle.textContent = 'Registro Docente';
+      }
+
+      tabLogin.addEventListener('click', showLoginTab);
+      tabRegister.addEventListener('click', showRegisterTab);
+
+      if (toggleLoginPass && loginPassword) {
+        toggleLoginPass.addEventListener('click', () => {
+          const isPass = loginPassword.type === 'password';
+          loginPassword.type = isPass ? 'text' : 'password';
+          loginEyeIcon.textContent = isPass ? 'visibility_off' : 'visibility';
+        });
+      }
+
+      // Alternar visualización de contraseñas en Registro
+      const regPass = document.getElementById('regPass');
+      const toggleRegPass = document.getElementById('toggleRegPass');
+      const regEyeIcon = document.getElementById('regEyeIcon');
+      if (toggleRegPass && regPass) {
+        toggleRegPass.addEventListener('click', () => {
+          const isPass = regPass.type === 'password';
+          regPass.type = isPass ? 'text' : 'password';
+          regEyeIcon.textContent = isPass ? 'visibility_off' : 'visibility';
+        });
+      }
+
+      const regPassConfirm = document.getElementById('regPassConfirm');
+      const toggleRegPassConfirm = document.getElementById('toggleRegPassConfirm');
+      const regConfirmEyeIcon = document.getElementById('regConfirmEyeIcon');
+      if (toggleRegPassConfirm && regPassConfirm) {
+        toggleRegPassConfirm.addEventListener('click', () => {
+          const isPass = regPassConfirm.type === 'password';
+          regPassConfirm.type = isPass ? 'text' : 'password';
+          regConfirmEyeIcon.textContent = isPass ? 'visibility_off' : 'visibility';
+        });
+      }
+
+      // Checklist dinámico de requisitos de contraseña
+      const reqLength = document.getElementById('reqLength');
+      const reqUpper = document.getElementById('reqUpper');
+      const reqNumber = document.getElementById('reqNumber');
+      const reqSpecial = document.getElementById('reqSpecial');
+
+      function updateRequirement(el, isMet) {
+        const icon = el.querySelector('.material-symbols-outlined');
+        if (isMet) {
+          el.className = 'flex items-center gap-1.5 text-emerald-600 font-bold transition-colors';
+          icon.textContent = 'check_circle';
+        } else {
+          el.className = 'flex items-center gap-1.5 text-slate-400 font-medium transition-colors';
+          icon.textContent = 'radio_button_unchecked';
+        }
+      }
+
+      if (regPass) {
+        regPass.addEventListener('input', () => {
+          const val = regPass.value;
+          updateRequirement(reqLength, val.length >= 8);
+          updateRequirement(reqUpper, /[A-Z]/.test(val));
+          updateRequirement(reqNumber, /[0-9]/.test(val));
+          updateRequirement(reqSpecial, /[^A-Za-z0-9]/.test(val));
+        });
+      }
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            if (data.requiresVerification) {
+              alert(data.error);
+              pendingEmail = data.email;
+              openVerifyStep(data.email);
+              return;
+            }
+            alert(data.error || 'Credenciales inválidas.');
+            return;
+          }
+
+          sessionStorage.setItem('srei_user', JSON.stringify(data.user));
+
+          if (data.isPendingApproval) {
+            document.getElementById('pendingTeacherName').textContent = data.user.nombre_completo;
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            verifyStep.classList.add('hidden');
+            pendingApprovalView.classList.remove('hidden');
+            cardTitle.textContent = 'Acceso Restringido';
+            return;
+          }
+
+          alert(`¡Bienvenido(a), ${data.user.nombre_completo}!`);
+          window.location.href = data.redirectTo || (data.user.rol === 'admin' ? '/estudiantes.html' : '/');
+        } catch {
+          alert('Error de conexión al servidor.');
+        }
+      });
+
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre_completo = document.getElementById('regNombre').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPass').value;
+        const confirmPassword = document.getElementById('regPassConfirm').value;
+        const mismatch = document.getElementById('passMismatch');
+
+        if (password !== confirmPassword) {
+          mismatch.classList.remove('hidden');
+          return;
+        }
+        mismatch.classList.add('hidden');
+
+        try {
+          const res = await fetch('/api/auth/register-profesor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre_completo, email, password, confirmPassword })
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            alert(data.error || 'Error al procesar registro.');
+            return;
+          }
+
+          pendingEmail = email;
+          openVerifyStep(email, data.debugCode);
+        } catch {
+          alert('Error de conexión al registrar.');
+        }
+      });
+
+      function openVerifyStep(email, debugCode) {
+        loginForm.classList.add('hidden');
+        registerForm.classList.add('hidden');
+        verifyStep.classList.remove('hidden');
+        cardTitle.textContent = 'Verificar Correo';
+        document.getElementById('verifyEmailDisplay').textContent = email;
+
+        const debugNotice = document.getElementById('debugCodeNotice');
+        if (debugCode) {
+          debugNotice.classList.remove('hidden');
+          document.getElementById('debugCodeVal').textContent = debugCode;
+        } else {
+          debugNotice.classList.add('hidden');
+        }
+      }
+
+      document.getElementById('btnConfirmCode').addEventListener('click', async () => {
+        const codigo = document.getElementById('inputCode').value.trim();
+        if (!codigo || codigo.length !== 6) {
+          alert('Introduce el código de 6 dígitos.');
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/auth/verify-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pendingEmail, codigo })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            verifyStep.classList.add('hidden');
+            pendingApprovalView.classList.remove('hidden');
+            cardTitle.textContent = 'En Espera de Aprobación';
+          } else {
+            alert(data.error || 'Código incorrecto.');
+          }
+        } catch {
+          alert('Error de conexión.');
+        }
+      });
+
+      document.getElementById('btnResendCode').addEventListener('click', async () => {
+        try {
+          const res = await fetch('/api/auth/resend-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pendingEmail })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert('Nuevo código enviado.');
+            if (data.debugCode) {
+              document.getElementById('debugCodeNotice').classList.remove('hidden');
+              document.getElementById('debugCodeVal').textContent = data.debugCode;
+            }
+          }
+        } catch {
+          alert('Error al reenviar.');
+        }
+      });
+
+      document.getElementById('btnBackToLogin').addEventListener('click', showLoginTab);
+    })();
+  </script>
+</body>
+</html>

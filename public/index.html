@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>SREI - Sistema de Registro Estudiantil Inclusivo</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1E3A8A',
+              navyDark: '#172554',
+              blue: '#3B82F6',
+              green: '#10B981',
+              greenHover: '#059669',
+              light: '#F8FAFC',
+              dark: '#1E293B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body.high-contrast {
+      background-color: #000000 !important;
+      color: #FFFFFF !important;
+    }
+
+    body.high-contrast header,
+    body.high-contrast footer,
+    body.high-contrast .bg-white {
+      background-color: #121212 !important;
+      color: #FFFFFF !important;
+      border-color: #FFFFFF !important;
+    }
+
+    body.high-contrast h1,
+    body.high-contrast h2,
+    body.high-contrast .text-brand-navy {
+      color: #FACC15 !important;
+    }
+
+    body.high-contrast .text-slate-600,
+    body.high-contrast .text-slate-500 {
+      color: #E2E8F0 !important;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-brand-light font-sans text-brand-dark min-h-screen flex flex-col relative antialiased selection:bg-brand-blue selection:text-white">
+
+  <!-- 1. Fondo Translúcido Suave (Atmósfera Inclusiva sin saturación) -->
+  <div aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <img alt="" class="w-full h-full object-cover object-center opacity-25 select-none filter blur-[0.5px]"
+      src="/assets/bg-translucent.jpg"
+      onerror="this.src='https://lh3.googleusercontent.com/aida/ALJJyrAkIeRJLHRZB_s4LKGSBn9qOVX6Q6YwJH8l48dvdwXJ5EX2KWyCJMHsVNxzG7FVZnoRIlC0IsL_x1I_w_0mfT-04aEsLuBQ69KTaj7CKOiKsa-PSNirIqg345dcBpQM3GdsARblRbLjt3CENBucaOwgqHo4I48wKxkcYBedseWGxcYcwNhnTJT-lSgxtBEiCPwjG8euMJSA-nIlgPkzf-SCw_JRY-Ypj4vw6jir_dcw'">
+    <div
+      class="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/90 via-[#F8FAFC]/75 to-[#F8FAFC]/95 backdrop-blur-[1px]">
+    </div>
+  </div>
+
+  <!-- 2. Barra Superior Limpia y Funcional -->
+  <header class="w-full bg-[#1E3A8A] text-white shadow-sm z-40 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+
+      <!-- Marca y Lema Institucional -->
+      <a href="/" class="flex items-center gap-2.5 hover:opacity-95 transition-opacity shrink-0">
+        <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+          <img src="/assets/srei-logo.png" alt="SREI" class="w-7 h-7 object-contain">
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
+          <span class="text-[10px] sm:text-[11px] text-white/80 font-medium hidden xs:block">Educación Inclusiva</span>
+        </div>
+      </a>
+
+      <!-- Área de Sesión de Usuario -->
+      <div class="flex items-center gap-1.5 sm:gap-3">
+        <div id="headerAuthContainer" class="flex items-center gap-2">
+          <!-- Renderizado dinámicamente -->
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 3. Zona Central (Hero Limpio, Equilibrado y sin Ruido Visual) -->
+  <main
+    class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-16 text-center max-w-4xl mx-auto w-full relative z-10">
+    <div class="flex flex-col items-center justify-center w-full max-w-2xl mx-auto">
+
+      <!-- Logotipo Oficial a Escala Armónica -->
+      <div
+        class="relative flex items-center justify-center mb-6 p-3 rounded-2xl bg-white/80 backdrop-blur-sm shadow-md border border-slate-200/80 hover:shadow-lg transition-all duration-300 hover:scale-105">
+        <img src="/assets/srei-logo.png" alt="Logotipo Educación Inclusiva SREI"
+          class="w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain mix-blend-multiply select-none">
+      </div>
+
+      <!-- Título y Frase Emblemática -->
+      <h2
+        class="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1E3A8A] tracking-tight leading-tight sm:leading-snug">
+        “Ser especial, es algo diferente”
+      </h2>
+
+      <!-- Subtítulo Institucional Limpio -->
+      <p class="mt-3 text-sm sm:text-base md:text-lg text-slate-700 font-semibold max-w-lg mx-auto">
+        Sistema de Registro Estudiantil Inclusivo (SREI)
+      </p>
+
+      <p class="mt-1 text-xs sm:text-sm text-slate-500 font-normal max-w-md mx-auto leading-relaxed">
+        Construyendo un camino equitativo donde cada estudiante brilla con luz propia mediante seguimiento y
+        adaptaciones curriculares oportunas.
+      </p>
+
+      <!-- Botones de Acción Claros y Ergonómicos -->
+      <div id="heroActionButtons"
+        class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full max-w-sm sm:max-w-md">
+        <!-- Renderizado dinámico según sesión -->
+      </div>
+
+      <!-- Métricas Resumen Sutileza Visual -->
+      <div class="mt-10 pt-6 border-t border-slate-200/80 grid grid-cols-3 gap-4 text-center w-full max-w-md">
+        <div>
+          <div id="statHomeTotal" class="text-lg sm:text-2xl font-bold text-[#1E3A8A]">...</div>
+          <div class="text-[11px] text-slate-500 font-medium">Expedientes</div>
+        </div>
+        <div>
+          <div id="statHomePlanteles" class="text-lg sm:text-2xl font-bold text-emerald-600">...</div>
+          <div class="text-[11px] text-slate-500 font-medium">Planteles</div>
+        </div>
+        <div>
+          <div id="statHomeAtendidos" class="text-lg sm:text-2xl font-bold text-blue-600">...</div>
+          <div class="text-[11px] text-slate-500 font-medium">Atención Activa</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 4. Pie de Página Minimalista -->
+  <footer
+    class="w-full bg-white/95 backdrop-blur-sm border-t border-slate-200/90 py-4 px-4 text-center text-xs text-slate-500 relative z-10 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p class="font-medium text-[11px] sm:text-xs text-slate-600">
+        &copy; 2025 SREI &bull; Todos los derechos reservados &bull; <strong class="text-[#10B981]">Educación
+          Inclusiva</strong>
+      </p>
+      <div class="flex items-center gap-3 text-[11px]">
+        <button id="btnFooterExport" class="text-[#1E3A8A] font-semibold hover:underline flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs text-emerald-600">database</span> Exportar a Supabase (.sql)
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      let currentUser = null;
+      try {
+        currentUser = JSON.parse(sessionStorage.getItem('srei_user'));
+      } catch (e) { currentUser = null; }
+
+      const headerAuthContainer = document.getElementById('headerAuthContainer');
+      const heroActionButtons = document.getElementById('heroActionButtons');
+
+      // 1. Cabecera y Botones según Sesión
+      if (!currentUser) {
+        headerAuthContainer.innerHTML = `
+          <a href="/login.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-white/20 transition-all">
+            <span class="material-symbols-outlined text-sm">login</span> Iniciar Sesión
+          </a>
+        `;
+
+        heroActionButtons.innerHTML = `
+          <a href="/login.html#registro" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105">
+            <span class="material-symbols-outlined text-xl">person_add</span> Registrarse
+          </a>
+          <a href="/login.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#1E3A8A] font-semibold text-sm px-6 py-3.5 rounded-xl border border-slate-200 shadow-sm transition-all">
+            <span class="material-symbols-outlined text-lg">login</span> Acceso Docente
+          </a>
+        `;
+      } else {
+        const isDirector = currentUser.rol === 'admin';
+        headerAuthContainer.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-white/90 font-medium hidden sm:inline">
+              ${isDirector ? '👔 Director' : '👨‍🏫 Docente'}: <strong>${escapeHtml(currentUser.nombre_completo.split(' ')[0])}</strong>
+            </span>
+            ${isDirector ? `
+              <a href="/estudiantes.html" class="inline-flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow transition-all">
+                <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Panel Estudiantes
+              </a>
+            ` : ''}
+            <button id="btnLogout" class="inline-flex items-center gap-1 bg-white/10 hover:bg-red-500/80 text-white text-xs font-semibold px-2 py-1.5 rounded-lg border border-white/20 transition-all" title="Cerrar sesión">
+              <span class="material-symbols-outlined text-sm">logout</span>
+            </button>
+          </div>
+        `;
+
+        heroActionButtons.innerHTML = isDirector ? `
+          <a href="/estudiantes.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#1E3A8A] hover:bg-blue-900 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105">
+            <span class="material-symbols-outlined text-xl">admin_panel_settings</span> Ir al Panel de Estudiantes
+          </a>
+        ` : `
+          <a href="/estudiantes.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105">
+            <span class="material-symbols-outlined text-xl">school</span> Ver Directorio de Estudiantes
+          </a>
+        `;
+
+        document.getElementById('btnLogout').addEventListener('click', () => {
+          sessionStorage.removeItem('srei_user');
+          window.location.reload();
+        });
+      }
+
+      // 2. Cargar Métricas Rápidas
+      async function loadStats() {
+        try {
+          const res = await fetch('/api/stats');
+          const json = await res.json();
+          if (json.success) {
+            document.getElementById('statHomeTotal').textContent = json.data.totalExpedientes;
+            document.getElementById('statHomePlanteles').textContent = json.data.totalPlanteles;
+            document.getElementById('statHomeAtendidos').textContent = json.data.psicologicaLista;
+          }
+        } catch {
+          document.getElementById('statHomeTotal').textContent = '-';
+          document.getElementById('statHomePlanteles').textContent = '-';
+          document.getElementById('statHomeAtendidos').textContent = '-';
+        }
+      }
+      loadStats();
+
+      document.getElementById('btnFooterExport').addEventListener('click', () => {
+        window.location.href = '/api/export/supabase';
+      });
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+    })();
+  </script>
+</body>
+
+</html>

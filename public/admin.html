@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>SREI - Gestión de Estudiantes</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1E3A8A',
+              navyDark: '#172554',
+              blue: '#3B82F6',
+              green: '#10B981',
+              light: '#F8FAFC',
+              dark: '#1E293B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-brand-dark min-h-screen flex flex-col antialiased">
+
+  <!-- 1. Cabecera Institucional con Navegación Adaptativa según Rol -->
+  <header class="bg-[#1E3A8A] text-white shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      
+      <!-- Marca -->
+      <div class="flex items-center gap-3">
+        <a href="/estudiantes.html" class="flex items-center gap-2.5 hover:opacity-95">
+          <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+            <img src="/assets/srei-logo.png" alt="SREI" class="w-7 h-7 object-contain">
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
+            <span class="text-[10px] sm:text-[11px] text-white/80 font-medium hidden xs:block">Educación Inclusiva</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navegación entre Módulos: Estudiantes siempre; Docentes sólo para Director -->
+      <nav id="topNavTabs" class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+        <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">school</span>
+          <span>Estudiantes</span>
+        </a>
+        <a id="navDocentesTab" href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">badge</span>
+          <span>Docentes</span>
+        </a>
+      </nav>
+
+      <!-- Bloque de Usuario (Director o Profesor con botón de Perfil) -->
+      <div class="flex items-center gap-2 pl-2 border-l border-white/20">
+        <div id="userInfoHeader" class="flex flex-col text-right hidden sm:flex">
+          <span id="headerUserName" class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
+          <span id="headerUserSub" class="text-[10px] text-emerald-300 font-semibold">Directora del Servicio Especial de Educación Inclusiva</span>
+        </div>
+        
+        <!-- Insignia / Botón Perfil Docente Adaptado para Móvil y Desktop -->
+        <button id="btnVerPerfil" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-white/20 transition-all cursor-pointer" title="Ver mi perfil">
+          <span class="material-symbols-outlined text-base">account_circle</span>
+          <span class="hidden md:inline">Mi Perfil</span>
+        </button>
+
+        <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
+          <span class="material-symbols-outlined text-base">logout</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 2. Contenido Principal: Gestión de Estudiantes -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-4">
+
+    <!-- Banner si la cuenta del profesor está en espera de activación -->
+    <div id="bannerDocentePendiente" class="hidden bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-2xl flex items-center gap-3 shadow-2xs">
+      <span class="material-symbols-outlined text-amber-600 text-2xl shrink-0">pending_actions</span>
+      <div class="text-xs flex-1 leading-relaxed">
+        <strong class="font-bold text-amber-950">Cuenta en espera de aprobación:</strong> Tu registro docente fue exitoso. La Directora <strong>Magister Amparo Aguilar</strong> debe activar tu cuenta para permitir la creación y edición completa de expedientes. Mientras tanto, tu acceso es de modo consulta.
+      </div>
+    </div>
+
+    <!-- Tarjeta Principal del Directorio de Estudiantes -->
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6 flex flex-col gap-4">
+      
+      <!-- Título y Acciones de Cabecera -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-[#1E3A8A] tracking-tight flex items-center gap-2">
+            <span class="material-symbols-outlined text-2xl text-[#10B981]">groups</span>
+            Directorio de Estudiantes
+          </h2>
+          <p class="text-xs text-slate-500">Expedientes escolares con seguimiento diagnóstico y checklist digital.</p>
+        </div>
+
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-end">
+          <button id="btnNuevoEstudiante" class="w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102">
+            <span class="material-symbols-outlined text-base">person_add</span> Nuevo Estudiante
+          </button>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button id="btnExportExcel" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs" title="Descargar reporte Excel institucional">
+              <span class="material-symbols-outlined text-base text-emerald-600">table_view</span> <span class="inline">Excel</span>
+            </button>
+            <button id="btnExportPdf" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs" title="Descargar reporte PDF oficial">
+              <span class="material-symbols-outlined text-base text-rose-600">picture_as_pdf</span> <span class="inline">PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Búsqueda y Filtros -->
+      <div class="flex flex-col sm:flex-row gap-2">
+        <div class="relative flex-1">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">search</span>
+          <input type="text" id="filterSearch" placeholder="Buscar por nombre, cédula o representante..." class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+        </div>
+        
+        <button id="btnToggleFiltros" class="sm:hidden px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-center gap-1 cursor-pointer">
+          <span class="material-symbols-outlined text-base">tune</span> Filtros
+        </button>
+
+        <div id="filtrosContainer" class="hidden sm:flex flex-col sm:flex-row gap-2">
+          <select id="filterPlantel" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+            <option value="">Todos los Planteles</option>
+          </select>
+          <select id="filterCondicion" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+            <option value="">Todas las Condiciones</option>
+            <option value="Dificultades para el aprendizaje">Dificultad de aprendizaje</option>
+            <option value="Déficit Cognitivo">Déficit Cognitivo</option>
+            <option value="Autismo / TEA">Autismo / TEA</option>
+            <option value="TDAH">TDAH</option>
+            <option value="Discapacidad Motora">Discapacidad Motora</option>
+            <option value="Epilepsia / Convulsiones">Epilepsia / Convulsiones</option>
+            <option value="Trastornos del Lenguaje">Trastornos del Lenguaje</option>
+          </select>
+          <select id="filterEstatusDiag" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+            <option value="">Estatus Diagnóstico</option>
+            <option value="Diagnóstico Médico Verificado">Verificado</option>
+            <option value="En Proceso de Evaluación">En Proceso</option>
+            <option value="Posible Proyección / Por Evaluar">Por Evaluar</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- VISTA MÓVIL: Tarjetas de Estudiantes (< 768px) -->
+      <div id="mobileCardsContainer" class="grid grid-cols-1 gap-3 md:hidden">
+        <!-- Render dinámico móvil -->
+      </div>
+
+      <!-- VISTA COMPUTADORA: Tabla Densa y Completa (>= 768px) -->
+      <div class="hidden md:block overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-100/80 text-slate-700 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-3">N°</th>
+              <th class="py-3 px-3">Estudiante</th>
+              <th class="py-3 px-3">Cédula</th>
+              <th class="py-3 px-3">Plantel & Grado</th>
+              <th class="py-3 px-3">Diagnóstico</th>
+              <th class="py-3 px-3">Checklist</th>
+              <th class="py-3 px-3">Representante</th>
+              <th class="py-3 px-3 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="estudiantesTableBody" class="divide-y divide-slate-100">
+            <!-- Render dinámico tabla -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="emptyState" class="hidden text-center py-10">
+        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">person_search</span>
+        <p class="text-sm text-slate-600 font-semibold">No se encontraron estudiantes con los filtros aplicados.</p>
+        <p class="text-xs text-slate-400 mt-1">Prueba cambiando los criterios de búsqueda o registra un nuevo estudiante.</p>
+      </div>
+
+    </div>
+
+    <!-- 3. SECCIÓN INFERIOR: MÉTRICAS DE ESTUDIANTES (Colocadas abajo por diseño limpio) -->
+    <div class="mt-2 flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">monitoring</span> Métricas Generales de Estudiantes
+        </h3>
+        <span class="text-[11px] text-slate-400">Actualizado en tiempo real</span>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Total Estudiantes con Desglose Varones / Hembras -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#1E3A8A] flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-xl">groups</span>
+            </div>
+            <div>
+              <div id="statTotalEstudiantes" class="text-lg sm:text-2xl font-extrabold text-[#1E3A8A]">...</div>
+              <div class="text-[11px] text-slate-500 font-medium">Total Estudiantes</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 pt-1.5 border-t border-slate-100 text-[10px] sm:text-[11px] font-semibold flex-wrap">
+            <span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <span>👦</span> <span id="statVarones">0</span> Varones
+            </span>
+            <span class="text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <span>👧</span> <span id="statHembras">0</span> Hembras
+            </span>
+          </div>
+        </div>
+
+        <!-- Planteles Activos -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">account_balance</span>
+          </div>
+          <div>
+            <div id="statPlanteles" class="text-lg sm:text-2xl font-extrabold text-slate-800">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Planteles Vinculados</div>
+          </div>
+        </div>
+
+        <!-- Atención Psicológica Lista -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">psychology</span>
+          </div>
+          <div>
+            <div id="statPsico" class="text-lg sm:text-2xl font-extrabold text-emerald-600">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Atención Psicológica Sí</div>
+          </div>
+        </div>
+
+        <!-- Informe Integral Listo -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">assignment_turned_in</span>
+          </div>
+          <div>
+            <div id="statInforme" class="text-lg sm:text-2xl font-extrabold text-indigo-600">...</div>
+            <div class="text-[11px] text-slate-500 font-medium">Informes Integrales Listos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: FICHA DETALLADA DEL ESTUDIANTE -->
+  <div id="fichaModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 p-5 sm:p-6 text-left">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-base font-bold text-[#1E3A8A] flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-lg text-[#10B981]">badge</span>
+          Ficha del Estudiante
+        </h3>
+        <button id="closeFichaModal" class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+          <span class="material-symbols-outlined text-base">close</span>
+        </button>
+      </div>
+      <div id="fichaContent" class="mt-4 flex flex-col gap-3.5 text-xs sm:text-sm"></div>
+      <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+        <button onclick="window.print()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">print</span> Imprimir
+        </button>
+        <button id="btnCerrarFicha" class="px-4 py-1.5 text-xs font-bold text-white bg-[#1E3A8A] rounded-lg cursor-pointer">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVO / EDITAR ESTUDIANTE (CON PLANTEL, CONDICIÓN RÁPIDA, CHECKLIST Y MEDICAMENTOS) -->
+  <div id="formExpedienteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[92vh] overflow-y-auto border border-slate-200 p-5 sm:p-6 text-left">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl text-[#10B981]">person_add</span>
+          <h3 id="formModalTitle" class="text-base font-bold text-[#1E3A8A]">Registrar Nuevo Estudiante</h3>
+        </div>
+        <button id="closeFormExpedienteModal" class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+          <span class="material-symbols-outlined text-base">close</span>
+        </button>
+      </div>
+
+      <form id="expedienteForm" class="mt-4 flex flex-col gap-4 text-xs sm:text-sm">
+        <input type="hidden" id="editExpedienteId" name="id">
+
+        <!-- 1. IDENTIFICACIÓN INSTITUCIONAL -->
+        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80">
+          <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">1. Identificación Institucional</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            
+            <!-- Plantel con Botones de Crear y Renombrar Inline -->
+            <div class="sm:col-span-2">
+              <div class="flex items-center justify-between mb-1">
+                <label class="block font-semibold text-slate-700 text-xs">Institución de Procedencia / Plantel *</label>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" id="btnModalNuevoPlantel" class="text-[11px] font-bold text-[#1E3A8A] hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[13px]">add</span> + Nuevo Plantel
+                  </button>
+                  <button type="button" id="btnModalEditarPlantel" class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[13px]">edit</span> Renombrar
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Formulario Inline para Crear o Renombrar Plantel -->
+              <div id="inlinePlantelPrompt" class="hidden mb-2 bg-blue-50 border border-blue-200 p-2.5 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+                <input type="text" id="inlinePlantelInput" placeholder="Nombre completo de la Institución / Escuela..." class="flex-1 text-xs px-2.5 py-1.5 border border-blue-300 rounded bg-white w-full">
+                <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                  <button type="button" id="btnGuardarPlantelInline" class="px-3 py-1 bg-[#1E3A8A] text-white text-xs font-bold rounded hover:bg-blue-900 transition-colors cursor-pointer">Guardar</button>
+                  <button type="button" id="btnCancelarPlantelInline" class="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300 transition-colors cursor-pointer">Cancelar</button>
+                </div>
+              </div>
+
+              <select id="formInstitucion" name="institucion_id" required class="w-full text-xs p-2 border rounded-lg bg-white"></select>
+            </div>
+
+            <div>
+              <label class="block font-semibold mb-0.5">N° Orden / Matrícula</label>
+              <input type="number" id="formNumeroOrden" name="numero_orden" placeholder="Ej. 1" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Cédula / Documento <span class="text-slate-400 font-normal">(Opcional)</span></label>
+              <input type="text" id="formCedula" name="cedula_identidad" placeholder="Dejar en blanco si aún no posee" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-semibold mb-0.5">Nombres y Apellidos completos *</label>
+              <input type="text" id="formNombres" name="nombres_apellidos" required placeholder="Ej. José Ramón Riera Marrufo" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Fecha de Nacimiento</label>
+              <input type="date" id="formFechaNac" name="fecha_nacimiento" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Edad Actual (Años)</label>
+              <input type="number" id="formEdad" name="edad" placeholder="Calculada o manual" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Sexo *</label>
+              <select id="formSexo" name="sexo" required class="w-full text-xs p-2 border rounded-lg bg-white">
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Grado y Sección / Año *</label>
+              <input type="text" id="formGradoSeccion" name="grado_seccion" required placeholder="Ej. 1ero 'U', 4to 'A', 5to 'U'" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. CONDICIÓN DIAGNÓSTICA DINÁMICA CON OPCIÓN DE CREAR Y EDITAR -->
+        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80">
+          <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">2. Condición Diagnóstica y Situación Especial</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            
+            <!-- Selector dinámico de Condiciones -->
+            <div class="sm:col-span-2">
+              <div class="flex items-center justify-between mb-1">
+                <label class="block font-semibold text-slate-700 text-xs">Condición Principal / Diagnóstico *</label>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" id="btnModalNuevaCondicion" class="text-[11px] font-bold text-[#10B981] hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[13px]">add</span> + Nueva Condición
+                  </button>
+                  <button type="button" id="btnModalEditarCondicion" class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[13px]">edit</span> Renombrar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Formulario Inline para Crear o Renombrar Condición -->
+              <div id="inlineCondicionPrompt" class="hidden mb-2 bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+                <input type="text" id="inlineCondicionInput" placeholder="Nombre de la condición diagnóstica (ej. Hipoacusia bilateral)..." class="flex-1 text-xs px-2.5 py-1.5 border border-emerald-300 rounded bg-white w-full">
+                <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                  <button type="button" id="btnGuardarCondicionInline" class="px-3 py-1 bg-[#10B981] text-white text-xs font-bold rounded hover:bg-emerald-600 transition-colors cursor-pointer">Guardar</button>
+                  <button type="button" id="btnCancelarCondicionInline" class="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300 transition-colors cursor-pointer">Cancelar</button>
+                </div>
+              </div>
+
+              <select id="formCondicion" name="condicion" required class="w-full text-xs p-2 border rounded-lg bg-white"></select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block font-semibold mb-0.5">Estatus Diagnóstico *</label>
+              <select id="formEstatusDiag" name="estatus_diagnostico" required class="w-full text-xs p-2 border rounded-lg bg-white">
+                <option value="Diagnóstico Médico Verificado">Diagnóstico Médico Verificado</option>
+                <option value="En Proceso de Evaluación">En Proceso de Evaluación</option>
+                <option value="Posible Proyección / Por Evaluar">Posible Proyección / Por Evaluar</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block font-semibold mb-0.5">Observaciones y Acuerdos de Seguimiento</label>
+              <textarea id="formObservaciones" name="observaciones" rows="2" placeholder="Orientaciones pedagógicas, acuerdos multidisciplinarios (CAIPA, CDI, etc.)..." class="w-full text-xs p-2 border rounded-lg bg-white"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. INFORMACIÓN DEL REPRESENTANTE -->
+        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80">
+          <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">3. Información del Representante</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-semibold mb-0.5">Nombre y Apellido del Representante</label>
+              <input type="text" id="formNombreRep" name="nombre_representante" placeholder="Ej. Juana Marrufo" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Cédula del Representante <span class="text-slate-400 font-normal">(Opcional)</span></label>
+              <input type="text" id="formCedulaRep" name="cedula_representante" placeholder="Ej. V-15432987" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Teléfono Principal de Contacto</label>
+              <input type="tel" id="formTelefonoRep" name="telefono" placeholder="Ej. 0424-6016615" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div>
+              <label class="block font-semibold mb-0.5">Parentesco</label>
+              <input type="text" id="formParentesco" name="parentesco" value="Madre" placeholder="Madre, Padre, Tutor, Abuela..." class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. CHECKLIST DIGITAL: ALINEACIÓN PERFECTA DE TEXTO (BIEN DERECHA) -->
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="border-b border-slate-100 pb-2 mb-3 flex items-center justify-between">
+            <h4 class="font-bold text-[#1E3A8A] text-xs uppercase tracking-wide flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm text-[#10B981]">checklist</span>
+              4. Estatus de Documentación (Checklist Digital)
+            </h4>
+            <span class="text-[11px] text-slate-400">Controles administrativos</span>
+          </div>
+
+          <div class="flex flex-col gap-2.5 text-xs">
+            <!-- Psicológica -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label for="formCheckPsico" class="w-24 font-bold text-slate-700 shrink-0">Psicológica:</label>
+              <select id="formCheckPsico" name="atencion_psicologica" class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
+                <option value="No">No</option>
+                <option value="En proceso">En proceso</option>
+                <option value="Sí">Sí</option>
+              </select>
+            </div>
+
+            <!-- Social -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label for="formCheckSocial" class="w-24 font-bold text-slate-700 shrink-0">Social:</label>
+              <select id="formCheckSocial" name="entrevista_social" class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
+                <option value="Pendiente">Pendiente</option>
+                <option value="Realizada">Realizada</option>
+              </select>
+            </div>
+
+            <!-- Informe -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label for="formCheckInforme" class="w-24 font-bold text-slate-700 shrink-0">Informe:</label>
+              <select id="formCheckInforme" name="informe_integral" class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
+                <option value="Falta informe psicológico">Falta informe psicológico</option>
+                <option value="En proceso">En proceso</option>
+                <option value="Listo">Listo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. SECCIÓN FINAL DE MEDICAMENTOS (SWITCH / BOTÓN ABAJO DEL 4) -->
+        <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200 shadow-2xs flex flex-col gap-3">
+          <input type="hidden" id="formTomaMedicamento" name="toma_medicamento" value="No">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-lg">medication</span>
+              </div>
+              <div>
+                <span class="font-bold text-amber-950 text-xs block">¿El estudiante toma algún medicamento?</span>
+                <span class="text-[11px] text-amber-700 block">Activa esta opción para registrar detalles y dosis</span>
+              </div>
+            </div>
+
+            <!-- Switch Botón Interactivo Toggle -->
+            <button type="button" id="btnSwitchMedicamento" class="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-bold text-xs transition-all cursor-pointer bg-white text-slate-600 border-slate-300 hover:bg-slate-50">
+              <span id="switchMedIcon" class="material-symbols-outlined text-sm text-slate-400">toggle_off</span>
+              <span id="switchMedLabel">No</span>
+            </button>
+          </div>
+
+          <!-- Bloque Desplegable de Especificaciones Médicas -->
+          <div id="bloqueMedicamentos" class="hidden pt-2.5 border-t border-amber-200 flex flex-col gap-1.5">
+            <label class="block font-bold text-amber-900 text-xs">Especificaciones del Medicamento y Protocolo Escolar *</label>
+            <p class="text-[11px] text-amber-800">Indica el nombre del medicamento, dosis, horario y protocolo a seguir en el plantel escolar.</p>
+            <textarea id="formMedicamentoDetalles" name="medicamento_detalles" rows="3" placeholder="Ej. Fenobarbital 100mg (1 tableta cada 12 horas). Mantener en resguardo en dirección. En caso de crisis convulsiva seguir protocolo de emergencia..." class="w-full text-xs p-2.5 border border-amber-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" id="btnCancelExpediente" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer">Cancelar</button>
+          <button type="submit" id="btnSaveExpediente" class="px-5 py-2 text-xs font-bold text-white bg-[#1E3A8A] hover:bg-blue-900 rounded-xl shadow-xs cursor-pointer">Guardar Expediente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PERFIL DEL PROFESOR / USUARIO CON EDICIÓN Y CONTRASEÑA OBLIGATORIA -->
+  <div id="perfilUsuarioModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-200 p-5 text-left max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-[#1E3A8A] flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-lg text-[#10B981]">badge</span>
+          Perfil Docente
+        </h3>
+        <button id="closePerfilModal" class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+          <span class="material-symbols-outlined text-base">close</span>
+        </button>
+      </div>
+
+      <form id="perfilForm" class="mt-4 flex flex-col gap-3.5 text-xs">
+        <div class="flex flex-col items-center text-center pb-2 border-b border-slate-100">
+          <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1.5 border-2 border-emerald-300">
+            <span class="material-symbols-outlined text-2xl">school</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold" id="perfilEstadoBadge"></div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1" for="perfilEditNombre">Nombre Completo *</label>
+          <input type="text" id="perfilEditNombre" required class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1" for="perfilEditEmail">Correo Electrónico *</label>
+          <input type="email" id="perfilEditEmail" required class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+        </div>
+
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <div class="font-bold text-slate-700 text-xs flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-[#1E3A8A]">lock_reset</span> Cambio de Contraseña (Opcional)
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-0.5" for="perfilEditNewPass">Nueva Contraseña</label>
+            <input type="password" id="perfilEditNewPass" placeholder="Dejar en blanco para no cambiar" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+          </div>
+        </div>
+
+        <!-- Confirmación de seguridad obligatoria -->
+        <div class="p-3 bg-rose-50/70 border border-rose-200 rounded-xl">
+          <label class="block font-bold text-rose-950 text-xs mb-1" for="perfilCurrentPass">
+            Ingresa tu Contraseña Actual *
+          </label>
+          <p class="text-[10px] text-rose-800 mb-1.5">Requerido obligatoriamente para autorizar y guardar cualquier cambio.</p>
+          <input type="password" id="perfilCurrentPass" required placeholder="Contraseña actual" class="w-full p-2 border border-rose-300 rounded-lg bg-white focus:ring-2 focus:ring-rose-500">
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+          <button type="button" id="perfilLogoutBtn" class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 font-bold text-xs rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+            <span class="material-symbols-outlined text-sm">logout</span> Salir
+          </button>
+          <button type="submit" id="btnGuardarPerfil" class="px-4 py-2 bg-[#1E3A8A] hover:bg-blue-900 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </div>
+
+  <!-- SCRIPT DE OPERACIONES -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Estado y Sesión de Usuario
+      const userStr = sessionStorage.getItem('srei_user');
+      let currentUser = null;
+      try {
+        currentUser = userStr ? JSON.parse(userStr) : null;
+      } catch (e) {}
+
+      // Si no hay usuario guardado, cargar perfil Directora por defecto
+      if (!currentUser) {
+        currentUser = {
+          id: 1,
+          nombre_completo: 'Magister Amparo Aguilar',
+          email: 'director@srei.edu',
+          rol: 'admin',
+          estado: 'activo'
+        };
+        sessionStorage.setItem('srei_user', JSON.stringify(currentUser));
+      }
+
+      const isDirector = currentUser.rol === 'admin';
+      const isDocente = currentUser.rol === 'docente';
+      const isDocentePendiente = isDocente && currentUser.estado === 'pendiente_aprobacion';
+
+      // 2. Adaptar Interfaz según Rol
+      const navDocentesTab = document.getElementById('navDocentesTab');
+      const headerUserName = document.getElementById('headerUserName');
+      const headerUserSub = document.getElementById('headerUserSub');
+      const btnVerPerfil = document.getElementById('btnVerPerfil');
+      const bannerDocentePendiente = document.getElementById('bannerDocentePendiente');
+      const btnNuevoEstudiante = document.getElementById('btnNuevoEstudiante');
+
+      if (isDirector) {
+        navDocentesTab.classList.remove('hidden');
+        headerUserName.textContent = 'Magister Amparo Aguilar';
+        headerUserSub.textContent = 'Directora del Servicio Especial de Educación Inclusiva';
+        btnVerPerfil.classList.add('hidden');
+      } else {
+        // Rol Docente
+        navDocentesTab.classList.add('hidden'); // Ocultar pestaña de docentes
+        headerUserName.textContent = currentUser.nombre_completo || 'Docente de Aula';
+        headerUserSub.textContent = 'Profesor(a) de Inclusión';
+        btnVerPerfil.classList.remove('hidden');
+
+        if (isDocentePendiente) {
+          bannerDocentePendiente.classList.remove('hidden');
+          btnNuevoEstudiante.classList.add('opacity-50');
+          btnNuevoEstudiante.title = 'Cuenta en espera de aprobación por la Dirección';
+        }
+      }
+
+      // Logout handlers
+      document.getElementById('adminLogoutBtn').addEventListener('click', logout);
+      document.getElementById('perfilLogoutBtn').addEventListener('click', logout);
+      function logout() {
+        sessionStorage.removeItem('srei_user');
+        window.location.href = '/login.html';
+      }
+
+      // Perfil Modal
+      const perfilModal = document.getElementById('perfilUsuarioModal');
+      btnVerPerfil.addEventListener('click', () => {
+        document.getElementById('perfilNombre').textContent = currentUser.nombre_completo;
+        document.getElementById('perfilEmail').textContent = currentUser.email;
+        document.getElementById('perfilRol').textContent = isDirector ? 'Directora' : 'Docente';
+        const badge = document.getElementById('perfilEstadoBadge');
+        if (currentUser.estado === 'activo') {
+          badge.className = 'mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800';
+          badge.textContent = 'Cuenta Activa';
+        } else {
+          badge.className = 'mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800';
+          badge.textContent = 'Pendiente de Aprobación';
+        }
+        perfilModal.classList.remove('hidden');
+      });
+      document.getElementById('closePerfilModal').addEventListener('click', () => perfilModal.classList.add('hidden'));
+
+      // 3. Variables de Datos y Selectores
+      let expedientesList = [];
+      let plantelesList = [];
+      let condicionesList = [];
+
+      const tableBody = document.getElementById('estudiantesTableBody');
+      const mobileContainer = document.getElementById('mobileCardsContainer');
+      const emptyState = document.getElementById('emptyState');
+      const filterSearch = document.getElementById('filterSearch');
+      const filterPlantel = document.getElementById('filterPlantel');
+      const filterCondicion = document.getElementById('filterCondicion');
+      const filterEstatusDiag = document.getElementById('filterEstatusDiag');
+      const formInstitucion = document.getElementById('formInstitucion');
+      const formCondicion = document.getElementById('formCondicion');
+      const formTomaMedicamento = document.getElementById('formTomaMedicamento');
+      const bloqueMedicamentos = document.getElementById('bloqueMedicamentos');
+      const formMedicamentoDetalles = document.getElementById('formMedicamentoDetalles');
+      const fichaModal = document.getElementById('fichaModal');
+      const fichaContent = document.getElementById('fichaContent');
+      const formModal = document.getElementById('formExpedienteModal');
+      const form = document.getElementById('expedienteForm');
+      const formModalTitle = document.getElementById('formModalTitle');
+
+      // 4. Referencias del Checklist Digital de texto
+      const formCheckPsico = document.getElementById('formCheckPsico');
+      const formCheckSocial = document.getElementById('formCheckSocial');
+      const formCheckInforme = document.getElementById('formCheckInforme');
+
+      // 4.1 Switch Interactivo Toggle de Medicamentos al final del formulario
+      const btnSwitchMedicamento = document.getElementById('btnSwitchMedicamento');
+      const switchMedIcon = document.getElementById('switchMedIcon');
+      const switchMedLabel = document.getElementById('switchMedLabel');
+
+      function setMedicamentoSwitch(toma) {
+        formTomaMedicamento.value = toma;
+        if (toma === 'Sí') {
+          btnSwitchMedicamento.className = 'self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-bold text-xs transition-all cursor-pointer bg-emerald-600 text-white border-emerald-700 shadow-xs';
+          switchMedIcon.textContent = 'toggle_on';
+          switchMedIcon.className = 'material-symbols-outlined text-base text-white';
+          switchMedLabel.textContent = 'Sí (Toma Medicamento)';
+          bloqueMedicamentos.classList.remove('hidden');
+          formMedicamentoDetalles.focus();
+        } else {
+          btnSwitchMedicamento.className = 'self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-bold text-xs transition-all cursor-pointer bg-white text-slate-600 border-slate-300 hover:bg-slate-50';
+          switchMedIcon.textContent = 'toggle_off';
+          switchMedIcon.className = 'material-symbols-outlined text-base text-slate-400';
+          switchMedLabel.textContent = 'No';
+          bloqueMedicamentos.classList.add('hidden');
+          formMedicamentoDetalles.value = '';
+        }
+      }
+
+      btnSwitchMedicamento.addEventListener('click', () => {
+        const nuevoEstado = formTomaMedicamento.value === 'Sí' ? 'No' : 'Sí';
+        setMedicamentoSwitch(nuevoEstado);
+      });
+
+      // 5. Gestión Dinámica Inline de Condiciones (Crear y Renombrar)
+      const btnModalNuevaCondicion = document.getElementById('btnModalNuevaCondicion');
+      const btnModalEditarCondicion = document.getElementById('btnModalEditarCondicion');
+      const inlineCondicionPrompt = document.getElementById('inlineCondicionPrompt');
+      const inlineCondicionInput = document.getElementById('inlineCondicionInput');
+      const btnGuardarCondicionInline = document.getElementById('btnGuardarCondicionInline');
+      const btnCancelarCondicionInline = document.getElementById('btnCancelarCondicionInline');
+      let condicionEditMode = 'nuevo';
+
+      btnModalNuevaCondicion.addEventListener('click', () => {
+        condicionEditMode = 'nuevo';
+        inlineCondicionInput.value = '';
+        inlineCondicionInput.placeholder = 'Nombre de la nueva condición (ej. Hipoacusia bilateral)...';
+        inlineCondicionPrompt.classList.remove('hidden');
+        inlineCondicionInput.focus();
+      });
+
+      btnModalEditarCondicion.addEventListener('click', () => {
+        const selectedVal = formCondicion.value;
+        if (!selectedVal) {
+          alert('Por favor selecciona primero una condición para renombrar.');
+          return;
+        }
+        const condObj = condicionesList.find(c => c.nombre_condicion === selectedVal);
+        condicionEditMode = 'renombrar';
+        inlineCondicionInput.value = selectedVal;
+        inlineCondicionInput.dataset.id = condObj ? condObj.id : '';
+        inlineCondicionPrompt.classList.remove('hidden');
+        inlineCondicionInput.focus();
+      });
+
+      btnCancelarCondicionInline.addEventListener('click', () => {
+        inlineCondicionPrompt.classList.add('hidden');
+      });
+
+      btnGuardarCondicionInline.addEventListener('click', async () => {
+        const nombre = inlineCondicionInput.value.trim();
+        if (!nombre) {
+          alert('Debes ingresar un nombre para la condición.');
+          return;
+        }
+
+        try {
+          if (condicionEditMode === 'nuevo') {
+            const res = await fetch('/api/condiciones', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre_condicion: nombre })
+            });
+            const data = await res.json();
+            if (data.success) {
+              await loadCondiciones();
+              formCondicion.value = data.data.nombre_condicion;
+              inlineCondicionPrompt.classList.add('hidden');
+            } else {
+              alert(data.error || 'Error al registrar condición');
+            }
+          } else {
+            const condId = inlineCondicionInput.dataset.id;
+            const res = await fetch(`/api/condiciones/${condId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre_condicion: nombre })
+            });
+            const data = await res.json();
+            if (data.success) {
+              await loadCondiciones();
+              await loadExpedientes();
+              formCondicion.value = data.data.nombre_condicion;
+              inlineCondicionPrompt.classList.add('hidden');
+            } else {
+              alert(data.error || 'Error al actualizar condición');
+            }
+          }
+        } catch (err) {
+          alert('Error de conexión: ' + err.message);
+        }
+      });
+
+      // 5. Gestión Dinámica Inline de Planteles (Crear y Renombrar)
+      const btnModalNuevoPlantel = document.getElementById('btnModalNuevoPlantel');
+      const btnModalEditarPlantel = document.getElementById('btnModalEditarPlantel');
+      const inlinePlantelPrompt = document.getElementById('inlinePlantelPrompt');
+      const inlinePlantelInput = document.getElementById('inlinePlantelInput');
+      const btnGuardarPlantelInline = document.getElementById('btnGuardarPlantelInline');
+      const btnCancelarPlantelInline = document.getElementById('btnCancelarPlantelInline');
+      let plantelEditMode = 'nuevo'; // 'nuevo' o 'renombrar'
+
+      btnModalNuevoPlantel.addEventListener('click', () => {
+        plantelEditMode = 'nuevo';
+        inlinePlantelInput.value = '';
+        inlinePlantelInput.placeholder = 'Nombre del nuevo plantel (ej. U.E. República de Venezuela)';
+        inlinePlantelPrompt.classList.remove('hidden');
+        inlinePlantelInput.focus();
+      });
+
+      btnModalEditarPlantel.addEventListener('click', () => {
+        const selectedId = formInstitucion.value;
+        if (!selectedId) {
+          alert('Por favor selecciona primero un plantel para renombrar.');
+          return;
+        }
+        const currentOpt = formInstitucion.options[formInstitucion.selectedIndex];
+        plantelEditMode = 'renombrar';
+        inlinePlantelInput.value = currentOpt.text;
+        inlinePlantelInput.placeholder = 'Nuevo nombre para el plantel...';
+        inlinePlantelPrompt.classList.remove('hidden');
+        inlinePlantelInput.focus();
+      });
+
+      btnCancelarPlantelInline.addEventListener('click', () => {
+        inlinePlantelPrompt.classList.add('hidden');
+      });
+
+      btnGuardarPlantelInline.addEventListener('click', async () => {
+        const nombre = inlinePlantelInput.value.trim();
+        if (!nombre) {
+          alert('Debes ingresar un nombre para el plantel.');
+          return;
+        }
+
+        try {
+          if (plantelEditMode === 'nuevo') {
+            const res = await fetch('/api/instituciones', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre_institucion: nombre })
+            });
+            const data = await res.json();
+            if (data.success) {
+              await loadInstituciones();
+              formInstitucion.value = data.data.id;
+              inlinePlantelPrompt.classList.add('hidden');
+            } else {
+              alert(data.error || 'Error al crear plantel');
+            }
+          } else {
+            const instId = formInstitucion.value;
+            const res = await fetch(`/api/instituciones/${instId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre_institucion: nombre })
+            });
+            const data = await res.json();
+            if (data.success) {
+              await loadInstituciones();
+              formInstitucion.value = instId;
+              inlinePlantelPrompt.classList.add('hidden');
+            } else {
+              alert(data.error || 'Error al actualizar plantel');
+            }
+          }
+        } catch (err) {
+          alert('Error al procesar plantel: ' + err.message);
+        }
+      });
+
+      // Cálculo de Edad Automática
+      const formFechaNac = document.getElementById('formFechaNac');
+      const formEdad = document.getElementById('formEdad');
+      formFechaNac.addEventListener('change', () => {
+        if (!formFechaNac.value) return;
+        const hoy = new Date();
+        const nac = new Date(formFechaNac.value);
+        let edad = hoy.getFullYear() - nac.getFullYear();
+        const m = hoy.getMonth() - nac.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+        if (edad >= 0) formEdad.value = edad;
+      });
+
+      // 6. Carga de Instituciones, Condiciones y Estadísticas
+      async function loadInstituciones() {
+        try {
+          const res = await fetch('/api/instituciones');
+          const json = await res.json();
+          if (json.success) {
+            plantelesList = json.data;
+            const currentFilter = filterPlantel.value;
+            filterPlantel.innerHTML = '<option value="">Todos los Planteles</option>';
+            formInstitucion.innerHTML = '<option value="">-- Seleccione Plantel --</option>';
+            plantelesList.forEach(inst => {
+              filterPlantel.innerHTML += `<option value="${inst.id}">${escapeHtml(inst.nombre_institucion)}</option>`;
+              formInstitucion.innerHTML += `<option value="${inst.id}">${escapeHtml(inst.nombre_institucion)}</option>`;
+            });
+            if (currentFilter) filterPlantel.value = currentFilter;
+          }
+        } catch (e) {
+          console.error('Error cargando planteles', e);
+        }
+      }
+
+      async function loadCondiciones() {
+        try {
+          const res = await fetch('/api/condiciones');
+          const json = await res.json();
+          if (json.success) {
+            condicionesList = json.data;
+            const currentFilter = filterCondicion.value;
+            filterCondicion.innerHTML = '<option value="">Todas las Condiciones</option>';
+            formCondicion.innerHTML = '<option value="">-- Seleccione Condición --</option>';
+            condicionesList.forEach(c => {
+              filterCondicion.innerHTML += `<option value="${escapeHtml(c.nombre_condicion)}">${escapeHtml(c.nombre_condicion)}</option>`;
+              formCondicion.innerHTML += `<option value="${escapeHtml(c.nombre_condicion)}">${escapeHtml(c.nombre_condicion)}</option>`;
+            });
+            if (currentFilter) filterCondicion.value = currentFilter;
+          }
+        } catch (e) {
+          console.error('Error cargando condiciones', e);
+        }
+      }
+
+      async function loadStats() {
+        try {
+          const res = await fetch('/api/stats');
+          const json = await res.json();
+          if (json.success) {
+            document.getElementById('statTotalEstudiantes').textContent = json.data.totalEstudiantes;
+            const elVarones = document.getElementById('statVarones');
+            if (elVarones) elVarones.textContent = json.data.totalVarones ?? 0;
+            const elHembras = document.getElementById('statHembras');
+            if (elHembras) elHembras.textContent = json.data.totalHembras ?? 0;
+            document.getElementById('statPlanteles').textContent = json.data.totalPlanteles;
+            document.getElementById('statPsico').textContent = json.data.psicologicaLista;
+            document.getElementById('statInforme').textContent = json.data.informeListo;
+          }
+        } catch (e) {
+          console.error('Error cargando stats', e);
+        }
+      }
+
+      // 7. Carga de Expedientes Estudiantiles
+      async function loadExpedientes() {
+        try {
+          const res = await fetch('/api/expedientes');
+          const json = await res.json();
+          if (json.success) {
+            expedientesList = json.data;
+            renderEstudiantes(expedientesList);
+          }
+        } catch (e) {
+          console.error('Error cargando expedientes', e);
+        }
+      }
+
+      // 8. Renderizado Adaptativo (Desktop Tabla + Mobile Cards)
+      function renderEstudiantes(items) {
+        tableBody.innerHTML = '';
+        mobileContainer.innerHTML = '';
+
+        if (!items || items.length === 0) {
+          emptyState.classList.remove('hidden');
+          return;
+        }
+        emptyState.classList.add('hidden');
+
+        items.forEach((item, index) => {
+          // Badges de Checklist
+          const badgePsico = item.atencion_psicologica === 'Sí' 
+            ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Atención Psicológica: Sí">PSI ✓</span>' 
+            : '<span class="bg-slate-100 text-slate-500 text-[10px] px-1.5 py-0.5 rounded" title="Atención Psicológica: Pendiente">PSI -</span>';
+          
+          const badgeSocial = item.entrevista_social === 'Realizada'
+            ? '<span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Entrevista Social: Realizada">SOC ✓</span>'
+            : '<span class="bg-slate-100 text-slate-500 text-[10px] px-1.5 py-0.5 rounded" title="Entrevista Social: Pendiente">SOC -</span>';
+
+          const badgeInforme = item.informe_integral === 'Listo'
+            ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Informe Integral: Listo">INF ✓</span>'
+            : '<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Informe Integral: En proceso">INF ...</span>';
+
+          const estatusColor = item.estatus_diagnostico === 'Diagnóstico Médico Verificado'
+            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+            : item.estatus_diagnostico === 'En Proceso de Evaluación'
+            ? 'bg-amber-50 text-amber-800 border border-amber-200'
+            : 'bg-blue-50 text-blue-800 border border-blue-200';
+
+          const telefonoLink = item.telefono && item.telefono !== 'No especificado'
+            ? `<a href="https://wa.me/58${item.telefono.replace(/\D/g, '')}" target="_blank" class="text-emerald-700 font-semibold hover:underline inline-flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">chat</span> ${escapeHtml(item.telefono)}</a>`
+            : '<span class="text-slate-400">Sin teléfono</span>';
+
+          const sexoEtiqueta = (item.sexo === 'Masculino' || item.sexo === 'M') ? 'Varón (M)' : 'Hembra (F)';
+
+          // A) FILA DE TABLA COMPUTADORA
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/70 transition-colors border-b border-slate-100';
+          tr.innerHTML = `
+            <td class="py-3 px-3 font-mono text-slate-400">${item.numero_orden || (index + 1)}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-[#1E3A8A] text-xs sm:text-sm">${escapeHtml(item.nombres_apellidos)}</div>
+              <div class="text-[11px] text-slate-500 font-medium">${item.edad_calculada || '—'} años · ${item.sexo === 'Masculino' ? 'M' : 'F'}</div>
+            </td>
+            <td class="py-3 px-3 font-mono text-slate-700 font-medium">${escapeHtml(item.cedula_identidad)}</td>
+            <td class="py-3 px-3">
+              <div class="font-semibold text-slate-800 truncate max-w-[160px]" title="${escapeHtml(item.nombre_institucion)}">${escapeHtml(item.nombre_institucion)}</div>
+              <div class="text-[11px] text-slate-500 font-bold">${escapeHtml(item.grado_seccion)}</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-800">${escapeHtml(item.condicion)}</div>
+              <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold ${estatusColor}">${escapeHtml(item.estatus_diagnostico)}</span>
+            </td>
+            <td class="py-3 px-3">
+              <div class="text-[11px] leading-snug font-medium text-slate-700 whitespace-nowrap space-y-0.5">
+                <div class="flex items-center"><span class="w-[74px] text-slate-500 font-semibold inline-block">Psicológica:</span><strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.atencion_psicologica)}</strong></div>
+                <div class="flex items-center"><span class="w-[74px] text-slate-500 font-semibold inline-block">Social:</span><strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.entrevista_social)}</strong></div>
+                <div class="flex items-center"><span class="w-[74px] text-slate-500 font-semibold inline-block">Informe:</span><strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.informe_integral)}</strong></div>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-semibold text-slate-800">${escapeHtml(item.nombre_representante)}</div>
+              <div class="text-[11px]">${telefonoLink}</div>
+            </td>
+            <td class="py-3 px-3 text-center">
+              <div class="inline-flex items-center gap-1">
+                <button onclick="verFicha(${item.id})" class="p-1.5 text-blue-700 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer" title="Ver Ficha Completa">
+                  <span class="material-symbols-outlined text-base">visibility</span>
+                </button>
+                <button onclick="editarEstudiante(${item.id})" class="p-1.5 text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer" title="Editar">
+                  <span class="material-symbols-outlined text-base">edit</span>
+                </button>
+                ${isDirector ? `
+                  <button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Eliminar">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+
+          // B) TARJETA MÓVIL (< 768px)
+          const card = document.createElement('div');
+          card.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col gap-2.5';
+          const medPill = (item.toma_medicamento === 'Sí' || item.toma_medicamento === 1 || item.toma_medicamento === '1')
+            ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300"><span class="material-symbols-outlined text-[11px]">medication</span> Medicado</span>`
+            : '';
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2">
+              <div>
+                <div class="text-[10px] font-mono text-slate-400">N° ${item.numero_orden || (index + 1)} · Cédula: <strong>${escapeHtml(item.cedula_identidad)}</strong></div>
+                <h4 class="font-bold text-sm text-[#1E3A8A] leading-tight">${escapeHtml(item.nombres_apellidos)}</h4>
+                <div class="text-[11px] text-slate-500 font-medium">${item.edad_calculada || '—'} años · ${sexoEtiqueta} · ${escapeHtml(item.grado_seccion)}</div>
+              </div>
+              <div class="flex flex-col items-end gap-1 shrink-0">
+                <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold ${estatusColor} text-right">${escapeHtml(item.estatus_diagnostico)}</span>
+                ${medPill}
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-700">
+              <div class="truncate"><span class="text-slate-400 font-medium">Plantel:</span> <strong>${escapeHtml(item.nombre_institucion)}</strong></div>
+              <div><span class="text-slate-400 font-medium">Condición:</span> <strong class="text-[#1E3A8A]">${escapeHtml(item.condicion)}</strong></div>
+              <div><span class="text-slate-400 font-medium">Representante:</span> ${escapeHtml(item.nombre_representante)} (${telefonoLink})</div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+              <div class="text-[11px] leading-snug font-medium text-slate-700 whitespace-nowrap space-y-0.5">
+                <div class="flex items-center"><span class="w-[74px] text-slate-500 font-semibold inline-block">Psicológica:</span><strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.atencion_psicologica)}</strong></div>
+                <div class="flex items-center"><span class="w-[74px] text-slate-500 font-semibold inline-block">Social:</span><strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.entrevista_social)}</strong></div>
+                <div class="flex items-center"><span class="w-[74px] text-slate-500 font-semibold inline-block">Informe:</span><strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.informe_integral)}</strong></div>
+              </div>
+              <div class="flex items-center gap-1.5 self-end">
+                <button onclick="verFicha(${item.id})" class="px-2.5 py-1.5 text-xs font-bold text-[#1E3A8A] bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center gap-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-sm">visibility</span> Ficha
+                </button>
+                <button onclick="editarEstudiante(${item.id})" class="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-sm">edit</span> Editar
+                </button>
+                ${isDirector ? `
+                  <button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors" title="Eliminar">
+                    <span class="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+          mobileContainer.appendChild(card);
+        });
+      }
+
+      // 9. Filtros
+      function filterData() {
+        const query = filterSearch.value.toLowerCase().trim();
+        const inst = filterPlantel.value;
+        const cond = filterCondicion.value.toLowerCase();
+        const estatus = filterEstatusDiag.value;
+
+        const filtered = expedientesList.filter(item => {
+          const matchQuery = !query || 
+            (item.nombres_apellidos && item.nombres_apellidos.toLowerCase().includes(query)) ||
+            (item.cedula_identidad && item.cedula_identidad.toLowerCase().includes(query)) ||
+            (item.nombre_representante && item.nombre_representante.toLowerCase().includes(query));
+
+          const matchInst = !inst || String(item.institucion_id) === String(inst);
+          const matchCond = !cond || (item.condicion && item.condicion.toLowerCase().includes(cond));
+          const matchEstatus = !estatus || item.estatus_diagnostico === estatus;
+
+          return matchQuery && matchInst && matchCond && matchEstatus;
+        });
+
+        renderEstudiantes(filtered);
+      }
+
+      filterSearch.addEventListener('input', filterData);
+      filterPlantel.addEventListener('change', filterData);
+      filterCondicion.addEventListener('change', filterData);
+      filterEstatusDiag.addEventListener('change', filterData);
+
+      document.getElementById('btnToggleFiltros').addEventListener('click', () => {
+        document.getElementById('filtrosContainer').classList.toggle('hidden');
+      });
+
+      // 10. Ver Ficha Completa
+      window.verFicha = function(id) {
+        const item = expedientesList.find(x => x.id === id);
+        if (!item) return;
+
+        fichaContent.innerHTML = `
+          <!-- Bloque 1 -->
+          <div class="bg-blue-50/60 p-3.5 rounded-xl border border-blue-200/60">
+            <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-1.5 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">account_balance</span> 1. Identificación Institucional
+            </h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div><span class="text-slate-500">Plantel:</span> <strong>${escapeHtml(item.nombre_institucion)}</strong></div>
+              <div><span class="text-slate-500">N° Orden:</span> <strong>${item.numero_orden || '—'}</strong></div>
+              <div><span class="text-slate-500">Estudiante:</span> <strong>${escapeHtml(item.nombres_apellidos)}</strong></div>
+              <div><span class="text-slate-500">Cédula:</span> <strong class="font-mono">${escapeHtml(item.cedula_identidad)}</strong></div>
+              <div><span class="text-slate-500">Fecha Nac:</span> <strong>${item.fecha_nacimiento || '—'}</strong></div>
+              <div><span class="text-slate-500">Edad / Sexo:</span> <strong>${item.edad_calculada} años (${item.sexo})</strong></div>
+              <div class="col-span-2"><span class="text-slate-500">Grado y Sección:</span> <strong>${escapeHtml(item.grado_seccion)}</strong></div>
+            </div>
+          </div>
+
+          <!-- Bloque 2 -->
+          <div class="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/60">
+            <h4 class="font-bold text-emerald-900 text-xs uppercase mb-1.5 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">clinical_notes</span> 2. Condición Diagnóstica
+            </h4>
+            <div class="text-xs flex flex-col gap-1">
+              <div><span class="text-slate-500">Condición Principal:</span> <strong class="text-emerald-800 font-bold">${escapeHtml(item.condicion)}</strong></div>
+              <div><span class="text-slate-500">Estatus:</span> <strong>${escapeHtml(item.estatus_diagnostico)}</strong></div>
+              <div><span class="text-slate-500">Observaciones y Seguimiento:</span> <p class="mt-0.5 text-slate-700 bg-white p-2 rounded border border-emerald-100">${escapeHtml(item.observaciones || 'Sin observaciones registradas.')}</p></div>
+            </div>
+          </div>
+
+          <!-- Bloque 3 -->
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <h4 class="font-bold text-slate-800 text-xs uppercase mb-1.5 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">person</span> 3. Representante Legal
+            </h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div><span class="text-slate-500">Nombre:</span> <strong>${escapeHtml(item.nombre_representante)}</strong></div>
+              <div><span class="text-slate-500">Parentesco:</span> <strong>${escapeHtml(item.parentesco || 'Representante Legal')}</strong></div>
+              <div><span class="text-slate-500">Teléfono:</span> <strong class="text-emerald-700">${escapeHtml(item.telefono)}</strong></div>
+              <div><span class="text-slate-500">Cédula:</span> <strong>${escapeHtml(item.cedula_representante || '—')}</strong></div>
+            </div>
+          </div>
+
+          <!-- Bloque 4: Checklist Digital (Estructurado y Recto de Letras) -->
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2 flex items-center gap-1 border-b border-slate-200 pb-1.5">
+              <span class="material-symbols-outlined text-sm text-[#10B981]">checklist</span> 4. Estatus de Documentación (Checklist Digital)
+            </h4>
+            <div class="text-xs py-1 space-y-1.5">
+              <div class="flex items-center"><span class="w-24 text-slate-500 font-semibold inline-block">Psicológica:</span> <strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.atencion_psicologica)}</strong></div>
+              <div class="flex items-center"><span class="w-24 text-slate-500 font-semibold inline-block">Social:</span> <strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.entrevista_social)}</strong></div>
+              <div class="flex items-center"><span class="w-24 text-slate-500 font-semibold inline-block">Informe:</span> <strong class="text-slate-900 font-bold ml-1">${escapeHtml(item.informe_integral)}</strong></div>
+            </div>
+          </div>
+
+          <!-- Bloque 5: Medicamentos (si aplica) -->
+          ${item.toma_medicamento === 'Sí' ? `
+            <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+              <h4 class="font-bold text-amber-900 text-xs uppercase mb-1.5 flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm text-amber-700">medication</span> 5. Medicamentos y Tratamiento
+              </h4>
+              <p class="text-xs text-amber-950 font-medium bg-white p-2.5 rounded border border-amber-200">${escapeHtml(item.medicamento_detalles || 'Sin especificaciones añadidas.')}</p>
+            </div>
+          ` : `
+            <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 text-xs text-slate-500 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm text-slate-400">check_circle</span> No toma medicamentos actualmente.
+            </div>
+          `}
+        `;
+        fichaModal.classList.remove('hidden');
+      };
+
+      document.getElementById('closeFichaModal').addEventListener('click', () => fichaModal.classList.add('hidden'));
+      document.getElementById('btnCerrarFicha').addEventListener('click', () => fichaModal.classList.add('hidden'));
+
+      // 11. Modal Nuevo / Editar Estudiante
+      btnNuevoEstudiante.addEventListener('click', () => {
+        if (isDocentePendiente) {
+          alert('Tu cuenta de docente está en espera de aprobación por la Dirección (Magister Amparo Aguilar). Podrás registrar estudiantes una vez sea activada.');
+          return;
+        }
+        form.reset();
+        document.getElementById('editExpedienteId').value = '';
+        formModalTitle.textContent = 'Registrar Nuevo Estudiante';
+        
+        // Reset checklist y medicamentos con valores por defecto
+        formCheckPsico.value = 'No';
+        formCheckSocial.value = 'Pendiente';
+        formCheckInforme.value = 'En proceso';
+        setMedicamentoSwitch('No');
+
+        formModal.classList.remove('hidden');
+      });
+
+      window.editarEstudiante = function(id) {
+        if (isDocentePendiente) {
+          alert('Tu cuenta de docente está en espera de aprobación por la Dirección.');
+          return;
+        }
+        const item = expedientesList.find(x => x.id === id);
+        if (!item) return;
+
+        form.reset();
+        document.getElementById('editExpedienteId').value = item.id;
+        formModalTitle.textContent = 'Editar Estudiante: ' + item.nombres_apellidos;
+
+        document.getElementById('formInstitucion').value = item.institucion_id;
+        document.getElementById('formNumeroOrden').value = item.numero_orden || '';
+        document.getElementById('formNombres').value = item.nombres_apellidos;
+        document.getElementById('formCedula').value = item.cedula_identidad;
+        document.getElementById('formFechaNac').value = item.fecha_nacimiento || '';
+        document.getElementById('formEdad').value = item.edad_calculada || '';
+        document.getElementById('formSexo').value = item.sexo;
+        document.getElementById('formGradoSeccion').value = item.grado_seccion;
+
+        document.getElementById('formCondicion').value = item.condicion;
+        document.getElementById('formEstatusDiag').value = item.estatus_diagnostico;
+        document.getElementById('formObservaciones').value = item.observaciones || '';
+
+        // Medicamentos con Switch
+        setMedicamentoSwitch(item.toma_medicamento === 'Sí' ? 'Sí' : 'No');
+        if (item.toma_medicamento === 'Sí') {
+          formMedicamentoDetalles.value = item.medicamento_detalles || '';
+        }
+
+        document.getElementById('formNombreRep').value = item.nombre_representante || '';
+        document.getElementById('formCedulaRep').value = item.cedula_representante || '';
+        document.getElementById('formTelefonoRep').value = item.telefono || '';
+        document.getElementById('formParentesco').value = item.parentesco || 'Madre';
+
+        // Asignación directa del Checklist Digital
+        formCheckPsico.value = item.atencion_psicologica || 'No';
+        formCheckSocial.value = item.entrevista_social || 'Pendiente';
+        formCheckInforme.value = item.informe_integral || 'En proceso';
+
+        formModal.classList.remove('hidden');
+      };
+
+      document.getElementById('closeFormExpedienteModal').addEventListener('click', () => formModal.classList.add('hidden'));
+      document.getElementById('btnCancelExpediente').addEventListener('click', () => formModal.classList.add('hidden'));
+
+      // 12. Guardar Estudiante (POST / PUT)
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editExpedienteId').value;
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+
+        // Asegurar checklist
+        payload.atencion_psicologica = document.getElementById('formCheckPsico').value;
+        payload.entrevista_social = document.getElementById('formCheckSocial').value;
+        payload.informe_integral = document.getElementById('formCheckInforme').value;
+
+        // Registrar por el id del usuario activo
+        payload.registrado_por = currentUser ? currentUser.id : 1;
+
+        const isEditing = !!id;
+        const url = isEditing ? `/api/expedientes/${id}` : '/api/expedientes';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const json = await res.json();
+          if (json.success) {
+            formModal.classList.add('hidden');
+            await loadExpedientes();
+            await loadStats();
+          } else {
+            alert(json.error || 'Ocurrió un error al guardar.');
+          }
+        } catch (err) {
+          alert('Error de conexión con el servidor local.');
+        }
+      });
+
+      // 13. Eliminar Estudiante (Sólo Admin / Directora)
+      window.eliminarEstudiante = async function(id) {
+        if (!confirm('¿Estás seguro de eliminar este estudiante del sistema?')) return;
+        try {
+          const res = await fetch(`/api/expedientes/${id}`, { method: 'DELETE' });
+          const json = await res.json();
+          if (json.success) {
+            await loadExpedientes();
+            await loadStats();
+          } else {
+            alert(json.error || 'No se pudo eliminar.');
+          }
+        } catch (e) {
+          alert('Error al intentar eliminar el registro.');
+        }
+      };
+
+      // Exportar a Excel y PDF institucionales
+      const btnExportExcel = document.getElementById('btnExportExcel');
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', () => {
+          window.open('/api/export/excel', '_blank');
+        });
+      }
+
+      const btnExportPdf = document.getElementById('btnExportPdf');
+      if (btnExportPdf) {
+        btnExportPdf.addEventListener('click', () => {
+          window.open('/api/export/pdf', '_blank');
+        });
+      }
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      // 14. Guardar Perfil de Docente con Validación de Contraseña
+      const perfilForm = document.getElementById('perfilForm');
+      if (perfilForm) {
+        perfilForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const nombre_completo = document.getElementById('perfilEditNombre').value.trim();
+          const email = document.getElementById('perfilEditEmail').value.trim();
+          const new_password = document.getElementById('perfilEditNewPass').value;
+          const current_password = document.getElementById('perfilCurrentPass').value;
+
+          if (!current_password) {
+            alert('Debes ingresar tu contraseña actual para confirmar los cambios.');
+            return;
+          }
+
+          try {
+            const res = await fetch('/api/usuarios/perfil', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id: currentUser.id,
+                nombre_completo,
+                email,
+                new_password,
+                current_password
+              })
+            });
+
+            const data = await res.json();
+            if (!data.success) {
+              alert(data.error || 'No se pudo actualizar el perfil.');
+              return;
+            }
+
+            alert('Perfil actualizado exitosamente.');
+            currentUser = data.data;
+            sessionStorage.setItem('srei_user', JSON.stringify(currentUser));
+            document.getElementById('perfilCurrentPass').value = '';
+            document.getElementById('perfilEditNewPass').value = '';
+            perfilModal.classList.add('hidden');
+
+            // Actualizar vista
+            if (headerUserName) headerUserName.textContent = currentUser.nombre_completo;
+          } catch (err) {
+            alert('Error de conexión al guardar perfil.');
+          }
+        });
+      }
+
+      // Al abrir modal de perfil, prellenar campos
+      btnVerPerfil.addEventListener('click', () => {
+        document.getElementById('perfilEditNombre').value = currentUser.nombre_completo;
+        document.getElementById('perfilEditEmail').value = currentUser.email;
+        document.getElementById('perfilCurrentPass').value = '';
+        document.getElementById('perfilEditNewPass').value = '';
+        const badge = document.getElementById('perfilEstadoBadge');
+        if (currentUser.estado === 'activo') {
+          badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800';
+          badge.textContent = 'Cuenta Activa';
+        } else {
+          badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800';
+          badge.textContent = 'Pendiente de Aprobación';
+        }
+        perfilModal.classList.remove('hidden');
+      });
+
+      // Inicialización
+      loadInstituciones();
+      loadCondiciones();
+      loadStats();
+      loadExpedientes();
+    });
+  </script>
+</body>
+</html>
