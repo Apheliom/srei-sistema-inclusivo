@@ -45,19 +45,42 @@ async function pullFromSupabase(db) {
     const client = await p.connect();
     isConnected = true;
 
+    // Asegurar columnas de borrado lógico y tabla bitácora en Supabase
+    try {
+      await client.query(`
+        ALTER TABLE public.estudiantes ADD COLUMN IF NOT EXISTS activo SMALLINT NOT NULL DEFAULT 1;
+        ALTER TABLE public.instituciones ADD COLUMN IF NOT EXISTS activo SMALLINT NOT NULL DEFAULT 1;
+        ALTER TABLE public.condiciones_diagnosticas ADD COLUMN IF NOT EXISTS activo SMALLINT NOT NULL DEFAULT 1;
+        CREATE TABLE IF NOT EXISTS public.bitacora (
+          id SERIAL PRIMARY KEY,
+          usuario_id INTEGER,
+          usuario_nombre VARCHAR(255),
+          usuario_email VARCHAR(255),
+          usuario_rol VARCHAR(50),
+          accion VARCHAR(100) NOT NULL,
+          modulo VARCHAR(100) NOT NULL,
+          detalles TEXT NOT NULL,
+          ip_address VARCHAR(100),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+    } catch (e) {
+      console.log('[Supabase Sync] Aviso verificando columnas y tablas de auditoría:', e.message);
+    }
+
     // 1. Instituciones
-    const resInst = await client.query('SELECT id, nombre_institucion, codigo_plantel, ubicacion FROM public.instituciones ORDER BY id ASC');
+    const resInst = await client.query('SELECT id, nombre_institucion, codigo_plantel, ubicacion, COALESCE(activo, 1) as activo FROM public.instituciones ORDER BY id ASC');
     if (resInst.rows.length > 0) {
-      const insStmt = db.prepare('INSERT OR REPLACE INTO instituciones (id, nombre_institucion, codigo_plantel, ubicacion) VALUES (?, ?, ?, ?)');
-      for (const r of resInst.rows) insStmt.run(r.id, r.nombre_institucion, r.codigo_plantel, r.ubicacion);
+      const insStmt = db.prepare('INSERT OR REPLACE INTO instituciones (id, nombre_institucion, codigo_plantel, ubicacion, activo) VALUES (?, ?, ?, ?, ?)');
+      for (const r of resInst.rows) insStmt.run(r.id, r.nombre_institucion, r.codigo_plantel, r.ubicacion, r.activo);
     }
 
     // 2. Condiciones Diagnósticas
     try {
-      const resCond = await client.query('SELECT id, nombre_condicion FROM public.condiciones_diagnosticas ORDER BY id ASC');
+      const resCond = await client.query('SELECT id, nombre_condicion, COALESCE(activo, 1) as activo FROM public.condiciones_diagnosticas ORDER BY id ASC');
       if (resCond.rows.length > 0) {
-        const condStmt = db.prepare('INSERT OR REPLACE INTO condiciones_diagnosticas (id, nombre_condicion) VALUES (?, ?)');
-        for (const r of resCond.rows) condStmt.run(r.id, r.nombre_condicion);
+        const condStmt = db.prepare('INSERT OR REPLACE INTO condiciones_diagnosticas (id, nombre_condicion, activo) VALUES (?, ?, ?)');
+        for (const r of resCond.rows) condStmt.run(r.id, r.nombre_condicion, r.activo);
       }
     } catch (e) { /* tabla opcional en versiones previas */ }
 
@@ -69,12 +92,12 @@ async function pullFromSupabase(db) {
     }
 
     // 4. Estudiantes
-    const resEst = await client.query('SELECT id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, registrado_por FROM public.estudiantes ORDER BY id ASC');
+    const resEst = await client.query('SELECT id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, COALESCE(activo, 1) as activo, registrado_por FROM public.estudiantes ORDER BY id ASC');
     if (resEst.rows.length > 0) {
-      const estStmt = db.prepare('INSERT OR REPLACE INTO estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, registrado_por) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+      const estStmt = db.prepare('INSERT OR REPLACE INTO estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
       for (const r of resEst.rows) {
         const fecha = r.fecha_nacimiento instanceof Date ? r.fecha_nacimiento.toISOString().split('T')[0] : r.fecha_nacimiento;
-        estStmt.run(r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, fecha, r.sexo, r.grado_seccion, r.registrado_por);
+        estStmt.run(r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, fecha, r.sexo, r.grado_seccion, r.activo, r.registrado_por);
       }
     }
 
@@ -92,6 +115,20 @@ async function pullFromSupabase(db) {
     if (resRep.rows.length > 0) {
       const repStmt = db.prepare('INSERT OR REPLACE INTO representantes (id, estudiante_id, nombre_representante, cedula_representante, telefono, parentesco) VALUES (?, ?, ?, ?, ?, ?)');
       for (const r of resRep.rows) repStmt.run(r.id, r.estudiante_id, r.nombre_representante, r.cedula_representante, r.telefono, r.parentesco);
+    }
+
+    // 7. Bitácora Institucional
+    try {
+      const resBit = await client.query('SELECT id, usuario_id, usuario_nombre, usuario_email, usuario_rol, accion, modulo, detalles, ip_address, created_at FROM public.bitacora ORDER BY id ASC');
+      if (resBit.rows.length > 0) {
+        const bitStmt = db.prepare(`INSERT OR REPLACE INTO bitacora (id, usuario_id, usuario_nombre, usuario_email, usuario_rol, accion, modulo, detalles, ip_address, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+        for (const r of resBit.rows) {
+          const dt = r.created_at instanceof Date ? r.created_at.toISOString().replace('T', ' ').substring(0, 19) : r.created_at;
+          bitStmt.run(r.id, r.usuario_id, r.usuario_nombre, r.usuario_email, r.usuario_rol, r.accion, r.modulo, r.detalles, r.ip_address, dt);
+        }
+      }
+    } catch (e) {
+      console.log('[Supabase Sync] Aviso recuperando bitácora:', e.message);
     }
 
     client.release();
@@ -116,9 +153,9 @@ async function syncTableToSupabase(tableName, db) {
         await client.query('DELETE FROM public.estudiantes');
         for (const r of rows) {
           await client.query(
-            `INSERT INTO public.estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, registrado_por)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-            [r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, r.fecha_nacimiento, r.sexo, r.grado_seccion, r.registrado_por]
+            `INSERT INTO public.estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            [r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, r.fecha_nacimiento, r.sexo, r.grado_seccion, r.activo ?? 1, r.registrado_por]
           );
         }
       } else if (tableName === 'expedientes_medicos') {
@@ -178,6 +215,16 @@ async function syncTableToSupabase(tableName, db) {
             [r.id, r.nombre_institucion, r.codigo_plantel, r.ubicacion]
           );
         }
+      } else if (tableName === 'bitacora') {
+        const rows = db.prepare('SELECT * FROM bitacora ORDER BY id DESC LIMIT 500').all();
+        for (const r of rows) {
+          await client.query(
+            `INSERT INTO public.bitacora (id, usuario_id, usuario_nombre, usuario_email, usuario_rol, accion, modulo, detalles, ip_address, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+             ON CONFLICT (id) DO NOTHING`,
+            [r.id, r.usuario_id, r.usuario_nombre, r.usuario_email, r.usuario_rol, r.accion, r.modulo, r.detalles, r.ip_address, r.created_at]
+          );
+        }
       }
     } finally {
       client.release();
@@ -213,10 +260,18 @@ function syncCatalogToSupabase(tableName, db) {
   });
 }
 
+function syncBitacoraToSupabase(db) {
+  if (!process.env.DATABASE_URL) return;
+  setImmediate(async () => {
+    await syncTableToSupabase('bitacora', db);
+  });
+}
+
 module.exports = {
   pullFromSupabase,
   syncStudentsToSupabase,
   syncUsersToSupabase,
-  syncCatalogToSupabase
+  syncCatalogToSupabase,
+  syncBitacoraToSupabase
 };
 

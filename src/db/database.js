@@ -27,4 +27,46 @@ try {
 const schema = fs.readFileSync(schemaPath, 'utf8');
 db.exec(schema);
 
+// Migración de borrado lógico (columna activo)
+try {
+  const infoEst = db.prepare("PRAGMA table_info(estudiantes)").all();
+  if (!infoEst.some(c => c.name === 'activo')) {
+    db.exec("ALTER TABLE estudiantes ADD COLUMN activo INTEGER NOT NULL DEFAULT 1;");
+  }
+} catch (e) {}
+
+try {
+  const infoInst = db.prepare("PRAGMA table_info(instituciones)").all();
+  if (!infoInst.some(c => c.name === 'activo')) {
+    db.exec("ALTER TABLE instituciones ADD COLUMN activo INTEGER NOT NULL DEFAULT 1;");
+  }
+} catch (e) {}
+
+try {
+  const infoCond = db.prepare("PRAGMA table_info(condiciones_diagnosticas)").all();
+  if (!infoCond.some(c => c.name === 'activo')) {
+    db.exec("ALTER TABLE condiciones_diagnosticas ADD COLUMN activo INTEGER NOT NULL DEFAULT 1;");
+  }
+} catch (e) {}
+
+// Garantizar creación de tabla bitácora
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS bitacora (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER,
+      usuario_nombre TEXT,
+      usuario_email TEXT,
+      usuario_rol TEXT,
+      accion TEXT NOT NULL,
+      modulo TEXT NOT NULL,
+      detalles TEXT NOT NULL,
+      ip_address TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_bitacora_created ON bitacora(created_at);
+    CREATE INDEX IF NOT EXISTS idx_bitacora_modulo ON bitacora(modulo);
+  `);
+} catch (e) {}
+
 module.exports = db;

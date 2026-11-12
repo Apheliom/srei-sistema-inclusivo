@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS instituciones (
   nombre_institucion TEXT NOT NULL UNIQUE,
   codigo_plantel TEXT,
   ubicacion TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,6 +45,7 @@ CREATE TABLE IF NOT EXISTS estudiantes (
   fecha_nacimiento DATE NOT NULL,
   sexo TEXT NOT NULL CHECK(sexo IN ('Masculino', 'Femenino')),
   grado_seccion TEXT NOT NULL,
+  activo INTEGER NOT NULL DEFAULT 1,
   registrado_por INTEGER REFERENCES usuarios(id),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -82,3 +84,32 @@ CREATE TABLE IF NOT EXISTS representantes (
 
 CREATE INDEX IF NOT EXISTS idx_representantes_estudiante ON representantes(estudiante_id);
 CREATE INDEX IF NOT EXISTS idx_representantes_telefono ON representantes(telefono);
+
+-- 6. Tabla de Condiciones Diagnósticas Normalizadas
+CREATE TABLE IF NOT EXISTS condiciones_diagnosticas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL UNIQUE,
+  categoria TEXT DEFAULT 'General',
+  activo INTEGER NOT NULL DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. Tabla Institucional de Auditoría y Bitácora (Magister Amparo Aguilar / Directora)
+CREATE TABLE IF NOT EXISTS bitacora (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id INTEGER,
+  usuario_nombre TEXT,
+  usuario_email TEXT,
+  usuario_rol TEXT,
+  accion TEXT NOT NULL,
+  modulo TEXT NOT NULL,
+  detalles TEXT NOT NULL,
+  ip_address TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_bitacora_created ON bitacora(created_at);
+CREATE INDEX IF NOT EXISTS idx_bitacora_modulo ON bitacora(modulo);
+CREATE INDEX IF NOT EXISTS idx_bitacora_accion ON bitacora(accion);
+CREATE INDEX IF NOT EXISTS idx_bitacora_usuario ON bitacora(usuario_id);
+

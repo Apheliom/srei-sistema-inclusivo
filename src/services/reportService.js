@@ -38,7 +38,7 @@ function categorizarNivel(nombreInstitucion, grado) {
  * Obtener todos los datos consolidados agrupados por institución
  */
 function getReportData(db) {
-  const instituciones = db.prepare('SELECT * FROM instituciones ORDER BY id ASC').all();
+  const instituciones = db.prepare('SELECT * FROM instituciones WHERE activo = 1 ORDER BY id ASC').all();
   
   const estudiantesRaw = db.prepare(`
     SELECT 
@@ -63,6 +63,7 @@ function getReportData(db) {
     FROM estudiantes e
     LEFT JOIN expedientes_medicos m ON e.id = m.estudiante_id
     LEFT JOIN representantes r ON e.id = r.estudiante_id
+    WHERE e.activo = 1
     ORDER BY e.institucion_id ASC, e.numero_orden ASC, e.id ASC
   `).all();
 

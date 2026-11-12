@@ -50,7 +50,7 @@
         </a>
       </div>
 
-      <!-- Navegación entre Módulos: Estudiantes siempre; Docentes sólo para Director -->
+      <!-- Navegación entre Módulos: Estudiantes siempre; Docentes y Bitácora sólo para Directora -->
       <nav id="topNavTabs" class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
         <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
           <span class="material-symbols-outlined text-base">school</span>
@@ -59,6 +59,10 @@
         <a id="navDocentesTab" href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
           <span class="material-symbols-outlined text-base">badge</span>
           <span>Docentes</span>
+        </a>
+        <a id="navBitacoraTab" href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5 hidden">
+          <span class="material-symbols-outlined text-base">history_edu</span>
+          <span>Bitácora</span>
         </a>
       </nav>
 
@@ -152,6 +156,11 @@
             <option value="Diagnóstico Médico Verificado">Verificado</option>
             <option value="En Proceso de Evaluación">En Proceso</option>
             <option value="Posible Proyección / Por Evaluar">Por Evaluar</option>
+          </select>
+          <select id="filterEstado" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50 font-semibold text-slate-700">
+            <option value="activos">Expedientes Activos</option>
+            <option value="inactivo">Histórico / Archivados</option>
+            <option value="todos">Todos los Expedientes</option>
           </select>
         </div>
       </div>
@@ -602,6 +611,7 @@
 
       // 2. Adaptar Interfaz según Rol
       const navDocentesTab = document.getElementById('navDocentesTab');
+      const navBitacoraTab = document.getElementById('navBitacoraTab');
       const headerUserName = document.getElementById('headerUserName');
       const headerUserSub = document.getElementById('headerUserSub');
       const btnVerPerfil = document.getElementById('btnVerPerfil');
@@ -610,12 +620,14 @@
 
       if (isDirector) {
         navDocentesTab.classList.remove('hidden');
+        if (navBitacoraTab) navBitacoraTab.classList.remove('hidden');
         headerUserName.textContent = 'Magister Amparo Aguilar';
         headerUserSub.textContent = 'Directora del Servicio Especial de Educación Inclusiva';
         btnVerPerfil.classList.add('hidden');
       } else {
         // Rol Docente
         navDocentesTab.classList.add('hidden'); // Ocultar pestaña de docentes
+        if (navBitacoraTab) navBitacoraTab.classList.add('hidden'); // Ocultar pestaña de bitácora
         headerUserName.textContent = currentUser.nombre_completo || 'Docente de Aula';
         headerUserSub.textContent = 'Profesor(a) de Inclusión';
         btnVerPerfil.classList.remove('hidden');
@@ -943,7 +955,9 @@
       // 7. Carga de Expedientes Estudiantiles
       async function loadExpedientes() {
         try {
-          const res = await fetch('/api/expedientes');
+          const filterEstado = document.getElementById('filterEstado');
+          const estadoVal = filterEstado ? filterEstado.value : 'activos';
+          const res = await fetch(`/api/expedientes?estado=${estadoVal}`);
           const json = await res.json();
           if (json.success) {
             expedientesList = json.data;
@@ -997,7 +1011,10 @@
           tr.innerHTML = `
             <td class="py-3 px-3 font-mono text-slate-400">${item.numero_orden || (index + 1)}</td>
             <td class="py-3 px-3">
-              <div class="font-bold text-[#1E3A8A] text-xs sm:text-sm">${escapeHtml(item.nombres_apellidos)}</div>
+              <div class="font-bold text-[#1E3A8A] text-xs sm:text-sm flex items-center gap-1.5">
+                <span>${escapeHtml(item.nombres_apellidos)}</span>
+                ${item.activo === 0 ? '<span class="bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded text-[9px] uppercase">Archivado</span>' : ''}
+              </div>
               <div class="text-[11px] text-slate-500 font-medium">${item.edad_calculada || '—'} años · ${item.sexo === 'Masculino' ? 'M' : 'F'}</div>
             </td>
             <td class="py-3 px-3 font-mono text-slate-700 font-medium">${escapeHtml(item.cedula_identidad)}</td>
@@ -1028,11 +1045,11 @@
                 <button onclick="editarEstudiante(${item.id})" class="p-1.5 text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer" title="Editar">
                   <span class="material-symbols-outlined text-base">edit</span>
                 </button>
-                ${isDirector ? `
-                  <button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Eliminar">
-                    <span class="material-symbols-outlined text-base">delete</span>
-                  </button>
-                ` : ''}
+                ${isDirector ? (
+                  item.activo === 0
+                    ? `<button onclick="reactivarEstudiante(${item.id})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer" title="Reactivar Expediente"><span class="material-symbols-outlined text-base">restore_from_trash</span></button>`
+                    : `<button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Desactivar / Archivar"><span class="material-symbols-outlined text-base">archive</span></button>`
+                ) : ''}
               </div>
             </td>
           `;
@@ -1048,7 +1065,10 @@
             <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2">
               <div>
                 <div class="text-[10px] font-mono text-slate-400">N° ${item.numero_orden || (index + 1)} · Cédula: <strong>${escapeHtml(item.cedula_identidad)}</strong></div>
-                <h4 class="font-bold text-sm text-[#1E3A8A] leading-tight">${escapeHtml(item.nombres_apellidos)}</h4>
+                <h4 class="font-bold text-sm text-[#1E3A8A] leading-tight flex items-center gap-1.5">
+                  <span>${escapeHtml(item.nombres_apellidos)}</span>
+                  ${item.activo === 0 ? '<span class="bg-slate-200 text-slate-700 font-bold px-1 py-0.5 rounded text-[8px] uppercase">Archivado</span>' : ''}
+                </h4>
                 <div class="text-[11px] text-slate-500 font-medium">${item.edad_calculada || '—'} años · ${sexoEtiqueta} · ${escapeHtml(item.grado_seccion)}</div>
               </div>
               <div class="flex flex-col items-end gap-1 shrink-0">
@@ -1076,11 +1096,11 @@
                 <button onclick="editarEstudiante(${item.id})" class="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 cursor-pointer">
                   <span class="material-symbols-outlined text-sm">edit</span> Editar
                 </button>
-                ${isDirector ? `
-                  <button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors" title="Eliminar">
-                    <span class="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                ` : ''}
+                ${isDirector ? (
+                  item.activo === 0
+                    ? `<button onclick="reactivarEstudiante(${item.id})" class="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 cursor-pointer" title="Reactivar"><span class="material-symbols-outlined text-sm">restore_from_trash</span> Reactivar</button>`
+                    : `<button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors" title="Desactivar / Archivar"><span class="material-symbols-outlined text-sm">archive</span></button>`
+                ) : ''}
               </div>
             </div>
           `;
@@ -1115,6 +1135,8 @@
       filterPlantel.addEventListener('change', filterData);
       filterCondicion.addEventListener('change', filterData);
       filterEstatusDiag.addEventListener('change', filterData);
+      const filterEstado = document.getElementById('filterEstado');
+      if (filterEstado) filterEstado.addEventListener('change', loadExpedientes);
 
       document.getElementById('btnToggleFiltros').addEventListener('click', () => {
         document.getElementById('filtrosContainer').classList.toggle('hidden');
@@ -1303,9 +1325,9 @@
         }
       });
 
-      // 13. Eliminar Estudiante (Sólo Admin / Directora)
+      // 13. Desactivar / Borrado Lógico de Estudiante (Sólo Admin / Directora)
       window.eliminarEstudiante = async function(id) {
-        if (!confirm('¿Estás seguro de eliminar este estudiante del sistema?')) return;
+        if (!confirm('¿Deseas desactivar y archivar este expediente? El registro quedará resguardado en el historial y podrá ser reactivado si el estudiante regresa.')) return;
         try {
           const res = await fetch(`/api/expedientes/${id}`, { method: 'DELETE' });
           const json = await res.json();
@@ -1313,10 +1335,27 @@
             await loadExpedientes();
             await loadStats();
           } else {
-            alert(json.error || 'No se pudo eliminar.');
+            alert(json.error || 'No se pudo desactivar.');
           }
         } catch (e) {
-          alert('Error al intentar eliminar el registro.');
+          alert('Error al intentar desactivar el registro.');
+        }
+      };
+
+      // 13.b Reactivar Estudiante Archivado
+      window.reactivarEstudiante = async function(id) {
+        if (!confirm('¿Deseas reactivar este expediente estudiantil? Volverá a estar activo en las listas y estadísticas generales.')) return;
+        try {
+          const res = await fetch(`/api/expedientes/${id}/reactivar`, { method: 'POST' });
+          const json = await res.json();
+          if (json.success) {
+            await loadExpedientes();
+            await loadStats();
+          } else {
+            alert(json.error || 'No se pudo reactivar.');
+          }
+        } catch (e) {
+          alert('Error al intentar reactivar el registro.');
         }
       };
 

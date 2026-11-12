@@ -7,7 +7,8 @@ const { generateSupabaseSQL } = require('./db/export');
 const { hashPassword, verifyPassword, generateVerificationCode } = require('./db/auth');
 const { sendVerificationEmail } = require('./services/emailService');
 const { generateExcelReport, generatePdfReport } = require('./services/reportService');
-const { pullFromSupabase, syncStudentsToSupabase, syncUsersToSupabase, syncCatalogToSupabase } = require('./db/supabase_sync');
+const { pullFromSupabase, syncStudentsToSupabase, syncUsersToSupabase, syncCatalogToSupabase, syncBitacoraToSupabase } = require('./db/supabase_sync');
+const { registrarBitacora } = require('./services/bitacoraService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -76,6 +77,7 @@ app.post('/api/auth/register-profesor', async (req, res) => {
     `).run(cleanEmail, nombre_completo.trim(), pHash, codigo, expira);
 
     const emailRes = await sendVerificationEmail(cleanEmail, codigo, nombre_completo.trim());
+    registrarBitacora(req, 'REGISTRO_DOCENTE', 'DOCENTES', `Solicitud de registro docente creada: ${nombre_completo.trim()} (${cleanEmail})`, db);
 
     res.status(201).json({
       success: true,
@@ -111,6 +113,7 @@ app.post('/api/auth/verify-code', (req, res) => {
       WHERE id = ?
     `).run(user.id);
     syncUsersToSupabase(db);
+    registrarBitacora(req, 'VERIFICAR_CORREO', 'AUTENTICACION', `Código verificado exitosamente por el docente ${user.nombre_completo} (${user.email})`, db, user);
 
     res.json({
       success: true,
@@ -155,6 +158,8 @@ app.post('/api/auth/login', (req, res) => {
     }
 
     const redirectTo = user.rol === 'admin' ? '/estudiantes.html' : '/';
+
+    registrarBitacora(req, 'INICIO_SESION', 'AUTENTICACION', `Inicio de sesión exitoso al sistema como ${user.rol.toUpperCase()}`, db, user);
 
     res.json({
       success: true,
@@ -340,6 +345,7 @@ app.put('/api/usuarios/perfil', async (req, res) => {
 
     const userActualizado = db.prepare('SELECT id, nombre_completo, email, rol, estado, email_verificado FROM usuarios WHERE id = ?').get(id);
     syncUsersToSupabase(db);
+    registrarBitacora(req, 'ACTUALIZAR_PERFIL', 'USUARIOS', `Perfil institucional actualizado para ${nuevoNombre} (${nuevoEmail})`, db, userActualizado);
 
     res.json({
       success: true,
@@ -351,10 +357,10 @@ app.put('/api/usuarios/perfil', async (req, res) => {
   }
 });
 
-// Listar expedientes estudiantiles con filtros y búsqueda
+// Listar expedientes estudiantiles con filtros y búsqueda (Soporta borrado lógico)
 app.get('/api/expedientes', (req, res) => {
   try {
-    const { search, institucion_id, condicion, grado_seccion, estatus_diagnostico } = req.query;
+    const { search, institucion_id, condicion, grado_seccion, estatus_diagnostico, estado } = req.query;
 
     let sql = `
       SELECT 
@@ -368,6 +374,7 @@ app.get('/api/expedientes', (req, res) => {
         e.fecha_nacimiento,
         e.sexo,
         e.grado_seccion,
+        e.activo,
         e.registrado_por,
         e.created_at,
         m.condicion,
@@ -390,6 +397,15 @@ app.get('/api/expedientes', (req, res) => {
     `;
 
     const params = [];
+
+    // Filtro de Borrado Lógico (por defecto solo activos)
+    if (estado === 'inactivo') {
+      sql += ` AND e.activo = 0`;
+    } else if (estado === 'todos') {
+      // no filtrar por activo
+    } else {
+      sql += ` AND e.activo = 1`;
+    }
 
     if (search) {
       sql += ` AND (e.nombres_apellidos LIKE ? OR e.cedula_identidad LIKE ? OR r.nombre_representante LIKE ?)`;
@@ -504,9 +520,9 @@ app.post('/api/expedientes', (req, res) => {
       ? cedula_identidad.trim().toUpperCase() 
       : `ESC-${numero_orden || Math.floor(Math.random() * 8999 + 1000)}-${Date.now().toString().slice(-4)}`;
 
-    const existe = db.prepare('SELECT id FROM estudiantes WHERE cedula_identidad = ?').get(cedulaLimpia);
-    if (existe) {
-      return res.status(409).json({ success: false, error: `Ya existe un estudiante con la cédula ${cedulaLimpia}.` });
+    const existe = db.prepare('SELECT id, activo FROM estudiantes WHERE cedula_identidad = ?').get(cedulaLimpia);
+    if (existe && existe.activo === 1) {
+      return res.status(409).json({ success: false, error: `Ya existe un estudiante activo con la cédula ${cedulaLimpia}.` });
     }
 
     // Normalizar Fecha y Sexo
@@ -525,18 +541,32 @@ app.post('/api/expedientes', (req, res) => {
     const tomaMedNormalizado = (toma_medicamento === 'Sí' || toma_medicamento === 'Si') ? 'Sí' : 'No';
 
     const crearExpedienteTx = db.transaction(() => {
-      // 1. Estudiante
-      const resEst = db.prepare(`
-        INSERT INTO estudiantes (
-          institucion_id, numero_orden, nombres_apellidos, cedula_identidad,
-          fecha_nacimiento, sexo, grado_seccion, registrado_por
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        institucion_id, numero_orden || null, nombres_apellidos.trim(), cedulaLimpia,
-        fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), registrado_por || 1
-      );
-
-      const estId = resEst.lastInsertRowid;
+      let estId;
+      if (existe && existe.activo === 0) {
+        estId = existe.id;
+        db.prepare(`
+          UPDATE estudiantes SET
+            institucion_id = ?, numero_orden = ?, nombres_apellidos = ?,
+            fecha_nacimiento = ?, sexo = ?, grado_seccion = ?, activo = 1
+          WHERE id = ?
+        `).run(
+          institucion_id, numero_orden || null, nombres_apellidos.trim(),
+          fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), estId
+        );
+        db.prepare('DELETE FROM expedientes_medicos WHERE estudiante_id = ?').run(estId);
+        db.prepare('DELETE FROM representantes WHERE estudiante_id = ?').run(estId);
+      } else {
+        const resEst = db.prepare(`
+          INSERT INTO estudiantes (
+            institucion_id, numero_orden, nombres_apellidos, cedula_identidad,
+            fecha_nacimiento, sexo, grado_seccion, activo, registrado_por
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)
+        `).run(
+          institucion_id, numero_orden || null, nombres_apellidos.trim(), cedulaLimpia,
+          fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), registrado_por || 1
+        );
+        estId = resEst.lastInsertRowid;
+      }
 
       // 2. Expediente Médico, Checklist Digital y Medicamentos
       db.prepare(`
@@ -569,7 +599,17 @@ app.post('/api/expedientes', (req, res) => {
 
     const nuevoId = crearExpedienteTx();
     syncStudentsToSupabase(db);
-    res.status(201).json({ success: true, message: 'Expediente estudiantil registrado correctamente.', id: nuevoId });
+    
+    if (existe && existe.activo === 0) {
+      registrarBitacora(req, 'REACTIVAR_ESTUDIANTE', 'ESTUDIANTES', `Expediente reactivado por coincidencia: ${nombres_apellidos.trim()} (C.I. ${cedulaLimpia}) - Condición: ${condicion}`, db);
+    } else {
+      registrarBitacora(req, 'CREAR_ESTUDIANTE', 'ESTUDIANTES', `Nuevo expediente registrado: ${nombres_apellidos.trim()} (C.I. ${cedulaLimpia}) - Condición: ${condicion}`, db);
+    }
+
+    const mensaje = (existe && existe.activo === 0)
+      ? 'El estudiante ya existía en el archivo histórico y fue reactivado exitosamente con los datos actualizados.'
+      : 'Expediente estudiantil registrado correctamente.';
+    res.status(201).json({ success: true, message: mensaje, id: nuevoId, reactivado: !!(existe && existe.activo === 0) });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -649,33 +689,60 @@ app.put('/api/expedientes/:id', (req, res) => {
 
     actualizarTx();
     syncStudentsToSupabase(db);
+    registrarBitacora(req, 'ACTUALIZAR_ESTUDIANTE', 'ESTUDIANTES', `Expediente actualizado: ${nombres_apellidos.trim()} (ID ${estId}, C.I. ${cedulaLimpia}) - Condición: ${condicion}`, db);
     res.json({ success: true, message: 'Expediente actualizado exitosamente.' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// Eliminar Expediente Estudiantil (Elimina en cascada)
+// Desactivar / Borrado Lógico de Expediente Estudiantil
 app.delete('/api/expedientes/:id', (req, res) => {
   try {
-    const result = db.prepare('DELETE FROM estudiantes WHERE id = ?').run(req.params.id);
+    const est = db.prepare('SELECT nombres_apellidos, cedula_identidad FROM estudiantes WHERE id = ?').get(req.params.id);
+    const result = db.prepare('UPDATE estudiantes SET activo = 0 WHERE id = ?').run(req.params.id);
     if (result.changes === 0) return res.status(404).json({ success: false, error: 'Expediente no encontrado.' });
     syncStudentsToSupabase(db);
-    res.json({ success: true, message: 'Expediente eliminado del sistema.' });
+    const nombre = est ? `${est.nombres_apellidos} (C.I. ${est.cedula_identidad})` : `ID ${req.params.id}`;
+    registrarBitacora(req, 'DESACTIVAR_ESTUDIANTE', 'ESTUDIANTES', `Expediente desactivado/archivado: ${nombre}`, db);
+    res.json({ success: true, message: 'Expediente desactivado y protegido en el archivo histórico.' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// Estadísticas del Panel Admin
+// Reactivar Expediente Estudiantil
+app.post('/api/expedientes/:id/reactivar', (req, res) => {
+  try {
+    const est = db.prepare('SELECT nombres_apellidos, cedula_identidad FROM estudiantes WHERE id = ?').get(req.params.id);
+    const result = db.prepare('UPDATE estudiantes SET activo = 1 WHERE id = ?').run(req.params.id);
+    if (result.changes === 0) return res.status(404).json({ success: false, error: 'Expediente no encontrado.' });
+    syncStudentsToSupabase(db);
+    const nombre = est ? `${est.nombres_apellidos} (C.I. ${est.cedula_identidad})` : `ID ${req.params.id}`;
+    registrarBitacora(req, 'REACTIVAR_ESTUDIANTE', 'ESTUDIANTES', `Expediente reactivado manualmente: ${nombre}`, db);
+    res.json({ success: true, message: 'Expediente reactivado exitosamente.' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Estadísticas del Panel Admin (Solo estudiantes e instituciones activas)
 app.get('/api/stats', (req, res) => {
   try {
-    const totalEstudiantes = db.prepare('SELECT COUNT(*) as c FROM estudiantes').get().c;
-    const totalVarones = db.prepare("SELECT COUNT(*) as c FROM estudiantes WHERE sexo LIKE 'M%'").get().c;
-    const totalHembras = db.prepare("SELECT COUNT(*) as c FROM estudiantes WHERE sexo LIKE 'F%'").get().c;
-    const totalPlanteles = db.prepare('SELECT COUNT(*) as c FROM instituciones').get().c;
-    const psicologicaLista = db.prepare("SELECT COUNT(*) as c FROM expedientes_medicos WHERE atencion_psicologica = 'Sí'").get().c;
-    const informeListo = db.prepare("SELECT COUNT(*) as c FROM expedientes_medicos WHERE informe_integral = 'Listo'").get().c;
+    const totalEstudiantes = db.prepare('SELECT COUNT(*) as c FROM estudiantes WHERE activo = 1').get().c;
+    const totalVarones = db.prepare("SELECT COUNT(*) as c FROM estudiantes WHERE activo = 1 AND sexo LIKE 'M%'").get().c;
+    const totalHembras = db.prepare("SELECT COUNT(*) as c FROM estudiantes WHERE activo = 1 AND sexo LIKE 'F%'").get().c;
+    const totalPlanteles = db.prepare('SELECT COUNT(*) as c FROM instituciones WHERE activo = 1').get().c;
+    const psicologicaLista = db.prepare(`
+      SELECT COUNT(*) as c FROM expedientes_medicos m 
+      JOIN estudiantes e ON m.estudiante_id = e.id 
+      WHERE e.activo = 1 AND m.atencion_psicologica = 'Sí'
+    `).get().c;
+    const informeListo = db.prepare(`
+      SELECT COUNT(*) as c FROM expedientes_medicos m 
+      JOIN estudiantes e ON m.estudiante_id = e.id 
+      WHERE e.activo = 1 AND m.informe_integral = 'Listo'
+    `).get().c;
 
     const docentesActivos = db.prepare("SELECT COUNT(*) as c FROM usuarios WHERE rol = 'profesor' AND estado = 'activo'").get().c;
     const docentesInactivos = db.prepare("SELECT COUNT(*) as c FROM usuarios WHERE rol = 'profesor' AND estado = 'inactivo'").get().c;
@@ -683,16 +750,19 @@ app.get('/api/stats', (req, res) => {
     const docentesTotal = db.prepare("SELECT COUNT(*) as c FROM usuarios WHERE rol = 'profesor'").get().c;
 
     const porCondicion = db.prepare(`
-      SELECT condicion, COUNT(*) as total 
-      FROM expedientes_medicos 
-      GROUP BY condicion 
+      SELECT m.condicion, COUNT(*) as total 
+      FROM expedientes_medicos m
+      JOIN estudiantes e ON m.estudiante_id = e.id
+      WHERE e.activo = 1
+      GROUP BY m.condicion 
       ORDER BY total DESC
     `).all();
 
     const porInstitucion = db.prepare(`
       SELECT i.nombre_institucion, COUNT(e.id) as total 
       FROM instituciones i
-      LEFT JOIN estudiantes e ON i.id = e.institucion_id
+      LEFT JOIN estudiantes e ON i.id = e.institucion_id AND e.activo = 1
+      WHERE i.activo = 1
       GROUP BY i.id
     `).all();
 
@@ -738,9 +808,70 @@ app.post('/api/admin/profesores/:id/status', (req, res) => {
   try {
     const { id } = req.params;
     const { estado, adminId } = req.body;
+    const targetUser = db.prepare('SELECT nombre_completo, email FROM usuarios WHERE id = ?').get(id);
     db.prepare('UPDATE usuarios SET estado = ?, aprobado_por = ?, aprobado_en = CURRENT_TIMESTAMP WHERE id = ?').run(estado, adminId || 1, id);
     syncUsersToSupabase(db);
+    const targetInfo = targetUser ? `${targetUser.nombre_completo} (${targetUser.email})` : `ID ${id}`;
+    registrarBitacora(req, 'CAMBIO_ESTADO_DOCENTE', 'DOCENTES', `Estado del docente ${targetInfo} actualizado a '${estado}'`, db);
     res.json({ success: true, message: `Estado actualizado a ${estado}.` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ====================================================================
+// BITÁCORA INSTITUCIONAL DE AUDITORÍA (EXCLUSIVO DIRECTORA / MAGISTER AMPARO AGUILAR)
+// ====================================================================
+
+app.get('/api/admin/bitacora', (req, res) => {
+  try {
+    const { search, desde, hasta, modulo, accion } = req.query;
+    let sql = `SELECT * FROM bitacora WHERE 1=1`;
+    const params = [];
+
+    if (search && search.trim()) {
+      sql += ` AND (detalles LIKE ? OR usuario_nombre LIKE ? OR usuario_email LIKE ? OR accion LIKE ? OR modulo LIKE ?)`;
+      const term = `%${search.trim()}%`;
+      params.push(term, term, term, term, term);
+    }
+
+    if (modulo && modulo !== 'todos' && modulo.trim()) {
+      sql += ` AND modulo = ?`;
+      params.push(modulo.trim());
+    }
+
+    if (accion && accion !== 'todas' && accion.trim()) {
+      sql += ` AND accion = ?`;
+      params.push(accion.trim());
+    }
+
+    if (desde && desde.trim()) {
+      sql += ` AND created_at >= ?`;
+      params.push(`${desde.trim()} 00:00:00`);
+    }
+
+    if (hasta && hasta.trim()) {
+      sql += ` AND created_at <= ?`;
+      params.push(`${hasta.trim()} 23:59:59`);
+    }
+
+    sql += ` ORDER BY id DESC LIMIT 500`;
+    const logs = db.prepare(sql).all(...params);
+
+    const totalMovimientos = db.prepare('SELECT COUNT(*) as c FROM bitacora').get().c;
+    const movimientosHoy = db.prepare("SELECT COUNT(*) as c FROM bitacora WHERE date(created_at) = date('now')").get().c;
+    const modulosDistintos = db.prepare('SELECT COUNT(DISTINCT modulo) as c FROM bitacora').get().c;
+
+    res.json({
+      success: true,
+      count: logs.length,
+      stats: {
+        totalMovimientos,
+        movimientosHoy,
+        modulosDistintos
+      },
+      data: logs
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -760,6 +891,7 @@ app.get('/api/export/supabase', (req, res) => {
 app.get('/api/export/excel', async (req, res) => {
   try {
     const buffer = await generateExcelReport(db);
+    registrarBitacora(req, 'DESCARGAR_EXCEL', 'REPORTES', 'Descarga de nómina institucional completa en formato Excel (.xlsx)', db);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename="SREI_Reporte_Estudiantil_Inclusivo.xlsx"');
     res.send(buffer);
@@ -773,6 +905,7 @@ app.get('/api/export/excel', async (req, res) => {
 app.get('/api/export/pdf', async (req, res) => {
   try {
     const buffer = await generatePdfReport(db);
+    registrarBitacora(req, 'DESCARGAR_PDF', 'REPORTES', 'Descarga de reporte oficial institucional en formato PDF', db);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="SREI_Reporte_Estudiantil_Inclusivo.pdf"');
     res.send(buffer);

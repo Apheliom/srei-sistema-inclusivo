@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitácora Institucional de Auditoría - SREI</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .badge-estudiantes { background-color: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .badge-docentes { background-color: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
+    .badge-autenticacion { background-color: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+    .badge-reportes { background-color: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+    .badge-usuarios { background-color: #F5F3FF; color: #6D28D9; border: 1px solid #DDD6FE; }
+    .badge-desactivar { background-color: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+    .badge-reactivar { background-color: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- 1. Barra de Navegación Institucional Oficial -->
+  <header class="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      
+      <!-- Marca y Escudo Institucional -->
+      <div class="flex items-center gap-3">
+        <a href="/estudiantes.html" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center border border-white/20 transition-colors">
+            <span class="material-symbols-outlined text-emerald-400 text-2xl">verified_user</span>
+          </div>
+          <div>
+            <span class="text-lg font-extrabold tracking-tight block leading-tight">SREI</span>
+            <span class="text-[10px] text-white/70 uppercase tracking-widest hidden sm:block">Auditoría Institucional</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navegación entre Módulos -->
+      <nav class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+        <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">school</span>
+          <span>Estudiantes</span>
+        </a>
+        <a href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">badge</span>
+          <span>Docentes</span>
+        </a>
+        <a href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">history_edu</span>
+          <span>Bitácora</span>
+        </a>
+      </nav>
+
+      <!-- Usuario Directora -->
+      <div class="flex items-center gap-2 pl-2 border-l border-white/20">
+        <div class="flex flex-col text-right hidden sm:flex">
+          <span class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
+          <span class="text-[10px] text-emerald-300 font-semibold">Directora del Servicio Especial de Educación Inclusiva</span>
+        </div>
+        <span class="sm:hidden bg-[#10B981] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Directora</span>
+        <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
+          <span class="material-symbols-outlined text-base">logout</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 2. Contenido Principal -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-5">
+    
+    <!-- Encabezado con Métricas Rápidas -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#1E3A8A] text-2xl sm:text-3xl">policy</span>
+          Bitácora Institucional de Movimientos y Auditoría
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+          Registro inalterable de acciones administrativas, médicas, altas, bajas lógicas y descargas oficiales.
+        </p>
+      </div>
+
+      <!-- Tarjetas de Resumen Numérico -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 shrink-0">
+        <div class="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs text-center">
+          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registros</span>
+          <span id="statTotal" class="text-base sm:text-lg font-black text-[#1E3A8A]">0</span>
+        </div>
+        <div class="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs text-center">
+          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hoy</span>
+          <span id="statHoy" class="text-base sm:text-lg font-black text-emerald-600">0</span>
+        </div>
+        <div class="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs text-center">
+          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Módulos</span>
+          <span id="statModulos" class="text-base sm:text-lg font-black text-indigo-600">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Filtros y Búsqueda -->
+    <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+        
+        <!-- Búsqueda de Texto Libre -->
+        <div class="lg:col-span-4 relative">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">search</span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar por detalle, persona, correo, cédula o acción..." 
+            class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+          >
+        </div>
+
+        <!-- Filtro por Módulo -->
+        <div class="lg:col-span-2">
+          <select id="moduloFilter" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="todos">Todos los Módulos</option>
+            <option value="ESTUDIANTES">Estudiantes</option>
+            <option value="DOCENTES">Docentes</option>
+            <option value="AUTENTICACION">Autenticación</option>
+            <option value="USUARIOS">Usuarios</option>
+            <option value="REPORTES">Reportes Oficiales</option>
+          </select>
+        </div>
+
+        <!-- Fecha Desde -->
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Desde:</label>
+            <input type="date" id="fechaDesde" class="w-full bg-transparent text-xs text-slate-700 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Fecha Hasta -->
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Hasta:</label>
+            <input type="date" id="fechaHasta" class="w-full bg-transparent text-xs text-slate-700 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Botones de Acción de Filtro -->
+        <div class="lg:col-span-2 flex items-center gap-2">
+          <button id="btnFiltrar" class="flex-1 bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-bold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs">
+            <span class="material-symbols-outlined text-base">filter_alt</span>
+            <span>Filtrar</span>
+          </button>
+          <button id="btnLimpiar" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all border border-slate-200 cursor-pointer" title="Limpiar filtros">
+            <span class="material-symbols-outlined text-base">refresh</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Tabla de Registros en Desktop y Cards en Móvil -->
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden flex flex-col">
+      
+      <!-- Vista de Tabla para Escritorio -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th class="py-3 px-4">Fecha y Hora</th>
+              <th class="py-3 px-4">Responsable</th>
+              <th class="py-3 px-4">Módulo</th>
+              <th class="py-3 px-4">Acción</th>
+              <th class="py-3 px-4">Detalle de la Operación</th>
+              <th class="py-3 px-4 text-center">IP</th>
+            </tr>
+          </thead>
+          <tbody id="bitacoraTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Vista de Tarjetas para Móviles -->
+      <div id="bitacoraMobileContainer" class="md:hidden divide-y divide-slate-100 p-2 space-y-2">
+        <!-- Tarjetas dinámicas -->
+      </div>
+
+      <!-- Estado Vacío -->
+      <div id="emptyState" class="hidden py-16 text-center flex flex-col items-center justify-center gap-3">
+        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+          <span class="material-symbols-outlined text-3xl">manage_search</span>
+        </div>
+        <p class="text-sm font-semibold text-slate-700">No se encontraron movimientos con los filtros seleccionados.</p>
+        <p class="text-xs text-slate-400">Intenta ampliando el rango de fechas o eliminando el término de búsqueda.</p>
+      </div>
+
+      <!-- Footer Informativo -->
+      <div class="bg-slate-50/80 border-t border-slate-100 px-4 py-2.5 flex items-center justify-between text-[11px] text-slate-500">
+        <span id="lblCount">Mostrando 0 movimientos</span>
+        <span class="flex items-center gap-1 font-semibold text-slate-600">
+          <span class="material-symbols-outlined text-sm text-emerald-600">lock</span>
+          Auditoría activa y sincronizada
+        </span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Verificación de Seguridad: Sólo Directora (admin)
+      const userRaw = sessionStorage.getItem('srei_user');
+      let currentUser = null;
+      try {
+        currentUser = JSON.parse(userRaw);
+      } catch (e) {}
+
+      if (!currentUser || currentUser.rol !== 'admin') {
+        alert('Acceso restringido: Esta sección de auditoría institucional es de uso exclusivo de la Directora Magister Amparo Aguilar.');
+        window.location.href = '/estudiantes.html';
+        return;
+      }
+
+      // 2. Selectores
+      const searchInput = document.getElementById('searchInput');
+      const moduloFilter = document.getElementById('moduloFilter');
+      const fechaDesde = document.getElementById('fechaDesde');
+      const fechaHasta = document.getElementById('fechaHasta');
+      const btnFiltrar = document.getElementById('btnFiltrar');
+      const btnLimpiar = document.getElementById('btnLimpiar');
+      const tableBody = document.getElementById('bitacoraTableBody');
+      const mobileContainer = document.getElementById('bitacoraMobileContainer');
+      const emptyState = document.getElementById('emptyState');
+      const lblCount = document.getElementById('lblCount');
+      const statTotal = document.getElementById('statTotal');
+      const statHoy = document.getElementById('statHoy');
+      const statModulos = document.getElementById('statModulos');
+      const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+
+      adminLogoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('srei_user');
+        window.location.href = '/login.html';
+      });
+
+      // 3. Formato de Fechas
+      function formatFecha(str) {
+        if (!str) return '-';
+        const d = new Date(str);
+        if (isNaN(d.getTime())) return str;
+        const pad = (n) => n.toString().padStart(2, '0');
+        const dia = pad(d.getDate());
+        const mes = pad(d.getMonth() + 1);
+        const año = d.getFullYear();
+        let horas = d.getHours();
+        const ampm = horas >= 12 ? 'PM' : 'AM';
+        horas = horas % 12 || 12;
+        const min = pad(d.getMinutes());
+        const seg = pad(d.getSeconds());
+        return `${dia}/${mes}/${año} ${pad(horas)}:${min}:${seg} ${ampm}`;
+      }
+
+      function getModuloBadge(modulo) {
+        switch (modulo) {
+          case 'ESTUDIANTES': return 'badge-estudiantes';
+          case 'DOCENTES': return 'badge-docentes';
+          case 'AUTENTICACION': return 'badge-autenticacion';
+          case 'REPORTES': return 'badge-reportes';
+          case 'USUARIOS': return 'badge-usuarios';
+          default: return 'bg-slate-100 text-slate-700 border-slate-200';
+        }
+      }
+
+      function getAccionBadge(accion) {
+        if (accion.includes('DESACTIVAR')) return 'badge-desactivar';
+        if (accion.includes('REACTIVAR')) return 'badge-reactivar';
+        if (accion.includes('CREAR') || accion.includes('REGISTRO')) return 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+        if (accion.includes('ACTUALIZAR') || accion.includes('CAMBIO')) return 'bg-amber-50 text-amber-800 border border-amber-200';
+        if (accion.includes('DESCARGAR')) return 'bg-indigo-50 text-indigo-800 border border-indigo-200';
+        return 'bg-slate-100 text-slate-700 border border-slate-200';
+      }
+
+      // 4. Cargar Registros
+      async function cargarBitacora() {
+        try {
+          const params = new URLSearchParams();
+          if (searchInput.value.trim()) params.append('search', searchInput.value.trim());
+          if (moduloFilter.value && moduloFilter.value !== 'todos') params.append('modulo', moduloFilter.value);
+          if (fechaDesde.value) params.append('desde', fechaDesde.value);
+          if (fechaHasta.value) params.append('hasta', fechaHasta.value);
+
+          const res = await fetch(`/api/admin/bitacora?${params.toString()}`);
+          const json = await res.json();
+
+          if (!json.success) {
+            console.error('Error al consultar bitácora:', json.error);
+            return;
+          }
+
+          if (json.stats) {
+            statTotal.textContent = json.stats.totalMovimientos || 0;
+            statHoy.textContent = json.stats.movimientosHoy || 0;
+            statModulos.textContent = json.stats.modulosDistintos || 0;
+          }
+
+          renderBitacora(json.data || []);
+        } catch (err) {
+          console.error('Error cargando bitácora:', err);
+        }
+      }
+
+      // 5. Renderizado
+      function renderBitacora(items) {
+        tableBody.innerHTML = '';
+        mobileContainer.innerHTML = '';
+        lblCount.textContent = `Mostrando ${items.length} movimientos`;
+
+        if (!items || items.length === 0) {
+          emptyState.classList.remove('hidden');
+          return;
+        }
+        emptyState.classList.add('hidden');
+
+        items.forEach(log => {
+          const fechaStr = formatFecha(log.created_at);
+          const moduloClass = getModuloBadge(log.modulo);
+          const accionClass = getAccionBadge(log.accion);
+
+          // Fila Desktop
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/70 transition-colors';
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-mono text-[11px] text-slate-600 whitespace-nowrap">${fechaStr}</td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-blue-100 text-[#1E3A8A] font-bold text-[11px] flex items-center justify-center shrink-0">
+                  ${(log.usuario_nombre || 'A').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900">${escapeHtml(log.usuario_nombre || 'Desconocido')}</div>
+                  <div class="text-[10px] text-slate-400 font-mono">${escapeHtml(log.usuario_email || '')}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${moduloClass}">${log.modulo}</span>
+            </td>
+            <td class="py-3 px-4 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${accionClass}">${log.accion}</span>
+            </td>
+            <td class="py-3 px-4 font-medium text-slate-800 leading-snug">
+              ${escapeHtml(log.detalles)}
+            </td>
+            <td class="py-3 px-4 text-center font-mono text-[10px] text-slate-400 whitespace-nowrap">
+              ${escapeHtml(log.ip_address || '127.0.0.1')}
+            </td>
+          `;
+          tableBody.appendChild(tr);
+
+          // Card Móvil
+          const card = document.createElement('div');
+          card.className = 'bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col gap-2';
+          card.innerHTML = `
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-mono text-slate-500 font-semibold">${fechaStr}</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${moduloClass}">${log.modulo}</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-900 leading-snug">
+              ${escapeHtml(log.detalles)}
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
+              <span class="font-bold text-slate-700 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs text-slate-400">person</span>
+                ${escapeHtml(log.usuario_nombre || 'Directora')}
+              </span>
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold ${accionClass}">${log.accion}</span>
+            </div>
+          `;
+          mobileContainer.appendChild(card);
+        });
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Eventos
+      btnFiltrar.addEventListener('click', cargarBitacora);
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') cargarBitacora();
+      });
+      moduloFilter.addEventListener('change', cargarBitacora);
+
+      btnLimpiar.addEventListener('click', () => {
+        searchInput.value = '';
+        moduloFilter.value = 'todos';
+        fechaDesde.value = '';
+        fechaHasta.value = '';
+        cargarBitacora();
+      });
+
+      // Carga inicial
+      cargarBitacora();
+    });
+  </script>
+</body>
+</html>
+
