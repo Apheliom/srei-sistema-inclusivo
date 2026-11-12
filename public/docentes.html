@@ -33,50 +33,71 @@
 </head>
 <body class="bg-[#F8FAFC] font-sans text-brand-dark min-h-screen flex flex-col antialiased">
 
-  <!-- 1. Cabecera Institucional con Navegación Superior -->
-  <header class="bg-[#1E3A8A] text-white shadow-sm sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+  <!-- 1. Cabecera Institucional con Navegación Superior Adaptativa -->
+  <header class="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
       
-      <!-- Marca -->
-      <div class="flex items-center gap-3">
-        <a href="/docentes.html" class="flex items-center gap-2.5 hover:opacity-95">
-          <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
-            <img src="/assets/srei-logo.png" alt="SREI" class="w-7 h-7 object-contain">
+      <!-- Fila Superior: Marca y Perfil -->
+      <div class="h-14 sm:h-16 flex items-center justify-between gap-2">
+        <a href="/docentes.html" class="flex items-center gap-2 hover:opacity-95 shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+            <img src="/assets/srei-logo.png" alt="SREI" class="w-6 h-6 sm:w-7 sm:h-7 object-contain">
           </div>
           <div class="flex flex-col">
             <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
-            <span class="text-[10px] sm:text-[11px] text-white/80 font-medium hidden xs:block">Educación Inclusiva</span>
+            <span class="text-[9px] sm:text-[11px] text-white/80 font-medium">Educación Inclusiva</span>
           </div>
         </a>
+
+        <!-- Navegación Desktop (Visible en md:) -->
+        <nav class="hidden md:flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+          <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Estudiantes</span>
+          </a>
+          <a href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">badge</span>
+            <span>Docentes</span>
+          </a>
+          <a href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Bitácora</span>
+          </a>
+        </nav>
+
+        <!-- Usuario Directora -->
+        <div class="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-white/20 shrink-0">
+          <div class="flex flex-col text-right hidden lg:flex">
+            <span class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
+            <span class="text-[10px] text-emerald-300 font-semibold">Directora de Educación Inclusiva</span>
+          </div>
+          <span class="lg:hidden bg-emerald-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Directora</span>
+          <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
+            <span class="material-symbols-outlined text-base">logout</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Navegación entre Módulos desde la Barra Superior -->
-      <nav class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
-        <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">school</span>
-          <span>Estudiantes</span>
-        </a>
-        <a href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">badge</span>
-          <span>Docentes</span>
-        </a>
-        <a href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">history_edu</span>
-          <span>Bitácora</span>
-        </a>
+      <!-- Fila Inferior Móvil: Pestañas 100% completas y visibles sin recortes -->
+      <nav class="md:hidden pb-2.5 pt-0.5">
+        <div class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs gap-1">
+          <a href="/estudiantes.html" class="flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Estudiantes</span>
+          </a>
+          <a href="/docentes.html" class="flex-1 py-1.5 px-2 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">badge</span>
+            <span>Docentes</span>
+          </a>
+          <a href="/bitacora.html" class="flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Bitácora</span>
+          </a>
+        </div>
       </nav>
 
-      <!-- Usuario Directora -->
-      <div class="flex items-center gap-2 pl-2 border-l border-white/20">
-        <div class="flex flex-col text-right hidden sm:flex">
-          <span class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
-          <span class="text-[10px] text-emerald-300 font-semibold">Directora del Servicio Especial de Educación Inclusiva</span>
-        </div>
-        <span class="sm:hidden bg-[#10B981] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Directora</span>
-        <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="Cerrar sesión">
-          <span class="material-symbols-outlined text-base">logout</span>
-        </button>
-      </div>
+    </div>
+  </header>
 
     </div>
   </header>

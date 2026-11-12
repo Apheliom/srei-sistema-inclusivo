@@ -34,55 +34,73 @@
 <body class="bg-[#F8FAFC] font-sans text-brand-dark min-h-screen flex flex-col antialiased">
 
   <!-- 1. Cabecera Institucional con Navegación Adaptativa según Rol -->
-  <header class="bg-[#1E3A8A] text-white shadow-sm sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+  <header class="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
       
-      <!-- Marca -->
-      <div class="flex items-center gap-3">
-        <a href="/estudiantes.html" class="flex items-center gap-2.5 hover:opacity-95">
-          <div class="w-9 h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
-            <img src="/assets/srei-logo.png" alt="SREI" class="w-7 h-7 object-contain">
+      <!-- Fila Superior: Marca Institucional y Usuario -->
+      <div class="h-14 sm:h-16 flex items-center justify-between gap-2">
+        <!-- Marca y Logotipo -->
+        <a href="/estudiantes.html" class="flex items-center gap-2 hover:opacity-95 shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+            <img src="/assets/srei-logo.png" alt="SREI" class="w-6 h-6 sm:w-7 sm:h-7 object-contain">
           </div>
           <div class="flex flex-col">
             <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
-            <span class="text-[10px] sm:text-[11px] text-white/80 font-medium hidden xs:block">Educación Inclusiva</span>
+            <span class="text-[9px] sm:text-[11px] text-white/80 font-medium">Educación Inclusiva</span>
           </div>
         </a>
-      </div>
 
-      <!-- Navegación entre Módulos: Estudiantes siempre; Docentes y Bitácora sólo para Directora -->
-      <nav id="topNavTabs" class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
-        <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">school</span>
-          <span>Estudiantes</span>
-        </a>
-        <a id="navDocentesTab" href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">badge</span>
-          <span>Docentes</span>
-        </a>
-        <a id="navBitacoraTab" href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5 hidden">
-          <span class="material-symbols-outlined text-base">history_edu</span>
-          <span>Bitácora</span>
-        </a>
-      </nav>
+        <!-- Navegación Desktop (Visible sólo en md:) -->
+        <nav id="topNavTabsDesktop" class="hidden md:flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+          <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Estudiantes</span>
+          </a>
+          <a href="/docentes.html" class="navDocentesTab px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">badge</span>
+            <span>Docentes</span>
+          </a>
+          <a href="/bitacora.html" class="navBitacoraTab px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5 hidden">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Bitácora</span>
+          </a>
+        </nav>
 
-      <!-- Bloque de Usuario (Director o Profesor con botón de Perfil) -->
-      <div class="flex items-center gap-2 pl-2 border-l border-white/20">
-        <div id="userInfoHeader" class="flex flex-col text-right hidden sm:flex">
-          <span id="headerUserName" class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
-          <span id="headerUserSub" class="text-[10px] text-emerald-300 font-semibold">Directora del Servicio Especial de Educación Inclusiva</span>
+        <!-- Bloque de Usuario (Director o Profesor con botón de Perfil) -->
+        <div class="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-white/20 shrink-0">
+          <div id="userInfoHeader" class="flex flex-col text-right hidden lg:flex">
+            <span id="headerUserName" class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
+            <span id="headerUserSub" class="text-[10px] text-emerald-300 font-semibold">Directora de Educación Inclusiva</span>
+          </div>
+          
+          <button id="btnVerPerfil" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-white/20 transition-all cursor-pointer" title="Ver mi perfil">
+            <span class="material-symbols-outlined text-base">account_circle</span>
+            <span class="hidden sm:inline">Mi Perfil</span>
+          </button>
+
+          <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
+            <span class="material-symbols-outlined text-base">logout</span>
+          </button>
         </div>
-        
-        <!-- Insignia / Botón Perfil Docente Adaptado para Móvil y Desktop -->
-        <button id="btnVerPerfil" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-white/20 transition-all cursor-pointer" title="Ver mi perfil">
-          <span class="material-symbols-outlined text-base">account_circle</span>
-          <span class="hidden md:inline">Mi Perfil</span>
-        </button>
-
-        <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
-          <span class="material-symbols-outlined text-base">logout</span>
-        </button>
       </div>
+
+      <!-- Fila Inferior Móvil: Pestañas 100% legibles y completas (Visible sólo en móviles < md) -->
+      <nav id="mobileNavTabs" class="md:hidden pb-2.5 pt-0.5">
+        <div class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs gap-1">
+          <a href="/estudiantes.html" class="flex-1 py-1.5 px-2 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Estudiantes</span>
+          </a>
+          <a href="/docentes.html" class="navDocentesTab flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">badge</span>
+            <span>Docentes</span>
+          </a>
+          <a href="/bitacora.html" class="navBitacoraTab flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center hidden">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Bitácora</span>
+          </a>
+        </div>
+      </nav>
 
     </div>
   </header>
@@ -290,31 +308,34 @@
   </div>
 
   <!-- MODAL: NUEVO / EDITAR ESTUDIANTE (CON PLANTEL, CONDICIÓN RÁPIDA, CHECKLIST Y MEDICAMENTOS) -->
-  <div id="formExpedienteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[92vh] overflow-y-auto border border-slate-200 p-5 sm:p-6 text-left">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+  <div id="formExpedienteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[94vh] flex flex-col border border-slate-200 text-left overflow-hidden">
+      
+      <!-- Cabecera Fija del Modal (Siempre visible) -->
+      <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-xl text-[#10B981]">person_add</span>
-          <h3 id="formModalTitle" class="text-base font-bold text-[#1E3A8A]">Registrar Nuevo Estudiante</h3>
+          <h3 id="formModalTitle" class="text-sm sm:text-base font-bold text-[#1E3A8A]">Registrar Nuevo Estudiante</h3>
         </div>
-        <button id="closeFormExpedienteModal" class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
-          <span class="material-symbols-outlined text-base">close</span>
+        <button id="closeFormExpedienteModal" class="w-8 h-8 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+          <span class="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
 
-      <form id="expedienteForm" class="mt-4 flex flex-col gap-4 text-xs sm:text-sm">
+      <!-- Formulario con Scroll Interno Suave -->
+      <form id="expedienteForm" class="p-3.5 sm:p-6 overflow-y-auto flex-1 flex flex-col gap-3.5 text-xs sm:text-sm">
         <input type="hidden" id="editExpedienteId" name="id">
 
         <!-- 1. IDENTIFICACIÓN INSTITUCIONAL -->
-        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80">
+        <div class="bg-slate-50/70 p-3 sm:p-3.5 rounded-xl border border-slate-200/80">
           <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">1. Identificación Institucional</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             
-            <!-- Plantel con Botones de Crear y Renombrar Inline -->
+            <!-- Plantel con Botones de Crear y Renombrar Inline Adaptados para Móvil -->
             <div class="sm:col-span-2">
-              <div class="flex items-center justify-between mb-1">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                 <label class="block font-semibold text-slate-700 text-xs">Institución de Procedencia / Plantel *</label>
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 self-start sm:self-auto">
                   <button type="button" id="btnModalNuevoPlantel" class="text-[11px] font-bold text-[#1E3A8A] hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[13px]">add</span> + Nuevo Plantel
                   </button>
@@ -371,15 +392,15 @@
         </div>
 
         <!-- 2. CONDICIÓN DIAGNÓSTICA DINÁMICA CON OPCIÓN DE CREAR Y EDITAR -->
-        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80">
+        <div class="bg-slate-50/70 p-3 sm:p-3.5 rounded-xl border border-slate-200/80">
           <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">2. Condición Diagnóstica y Situación Especial</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             
-            <!-- Selector dinámico de Condiciones -->
+            <!-- Selector dinámico de Condiciones Adaptado para Móvil -->
             <div class="sm:col-span-2">
-              <div class="flex items-center justify-between mb-1">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                 <label class="block font-semibold text-slate-700 text-xs">Condición Principal / Diagnóstico *</label>
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 self-start sm:self-auto">
                   <button type="button" id="btnModalNuevaCondicion" class="text-[11px] font-bold text-[#10B981] hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[13px]">add</span> + Nueva Condición
                   </button>
@@ -418,7 +439,7 @@
         </div>
 
         <!-- 3. INFORMACIÓN DEL REPRESENTANTE -->
-        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80">
+        <div class="bg-slate-50/70 p-3 sm:p-3.5 rounded-xl border border-slate-200/80">
           <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">3. Información del Representante</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
@@ -441,13 +462,13 @@
         </div>
 
         <!-- 4. CHECKLIST DIGITAL: ALINEACIÓN PERFECTA DE TEXTO (BIEN DERECHA) -->
-        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+        <div class="bg-white rounded-xl border border-slate-200 p-3 sm:p-3.5 shadow-2xs">
           <div class="border-b border-slate-100 pb-2 mb-3 flex items-center justify-between">
             <h4 class="font-bold text-[#1E3A8A] text-xs uppercase tracking-wide flex items-center gap-1.5">
               <span class="material-symbols-outlined text-sm text-[#10B981]">checklist</span>
               4. Estatus de Documentación (Checklist Digital)
             </h4>
-            <span class="text-[11px] text-slate-400">Controles administrativos</span>
+            <span class="text-[11px] text-slate-400 hidden sm:inline">Controles administrativos</span>
           </div>
 
           <div class="flex flex-col gap-2.5 text-xs">
@@ -483,7 +504,7 @@
         </div>
 
         <!-- 5. SECCIÓN FINAL DE MEDICAMENTOS (SWITCH / BOTÓN ABAJO DEL 4) -->
-        <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200 shadow-2xs flex flex-col gap-3">
+        <div class="bg-amber-50/60 p-3 sm:p-3.5 rounded-xl border border-amber-200 shadow-2xs flex flex-col gap-3">
           <input type="hidden" id="formTomaMedicamento" name="toma_medicamento" value="No">
           
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -512,7 +533,8 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+        <!-- Botones de Acción (Fijos en parte inferior del modal) -->
+        <div class="sticky bottom-0 bg-white/95 backdrop-blur-xs pt-3 pb-1 -mb-1 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0 z-10">
           <button type="button" id="btnCancelExpediente" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer">Cancelar</button>
           <button type="submit" id="btnSaveExpediente" class="px-5 py-2 text-xs font-bold text-white bg-[#1E3A8A] hover:bg-blue-900 rounded-xl shadow-xs cursor-pointer">Guardar Expediente</button>
         </div>
@@ -610,8 +632,8 @@
       const isDocentePendiente = isDocente && currentUser.estado === 'pendiente_aprobacion';
 
       // 2. Adaptar Interfaz según Rol
-      const navDocentesTab = document.getElementById('navDocentesTab');
-      const navBitacoraTab = document.getElementById('navBitacoraTab');
+      const docTabs = document.querySelectorAll('.navDocentesTab');
+      const bitTabs = document.querySelectorAll('.navBitacoraTab');
       const headerUserName = document.getElementById('headerUserName');
       const headerUserSub = document.getElementById('headerUserSub');
       const btnVerPerfil = document.getElementById('btnVerPerfil');
@@ -619,17 +641,17 @@
       const btnNuevoEstudiante = document.getElementById('btnNuevoEstudiante');
 
       if (isDirector) {
-        navDocentesTab.classList.remove('hidden');
-        if (navBitacoraTab) navBitacoraTab.classList.remove('hidden');
-        headerUserName.textContent = 'Magister Amparo Aguilar';
-        headerUserSub.textContent = 'Directora del Servicio Especial de Educación Inclusiva';
+        docTabs.forEach(el => el.classList.remove('hidden'));
+        bitTabs.forEach(el => el.classList.remove('hidden'));
+        if (headerUserName) headerUserName.textContent = 'Magister Amparo Aguilar';
+        if (headerUserSub) headerUserSub.textContent = 'Directora del Servicio Especial de Educación Inclusiva';
         btnVerPerfil.classList.add('hidden');
       } else {
         // Rol Docente
-        navDocentesTab.classList.add('hidden'); // Ocultar pestaña de docentes
-        if (navBitacoraTab) navBitacoraTab.classList.add('hidden'); // Ocultar pestaña de bitácora
-        headerUserName.textContent = currentUser.nombre_completo || 'Docente de Aula';
-        headerUserSub.textContent = 'Profesor(a) de Inclusión';
+        docTabs.forEach(el => el.classList.add('hidden')); // Ocultar pestañas de docentes
+        bitTabs.forEach(el => el.classList.add('hidden')); // Ocultar pestañas de bitácora
+        if (headerUserName) headerUserName.textContent = currentUser.nombre_completo || 'Docente de Aula';
+        if (headerUserSub) headerUserSub.textContent = 'Profesor(a) de Inclusión';
         btnVerPerfil.classList.remove('hidden');
 
         if (isDocentePendiente) {

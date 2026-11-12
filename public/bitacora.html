@@ -7,11 +7,32 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1E3A8A',
+              navyDark: '#172554',
+              blue: '#3B82F6',
+              green: '#10B981',
+              light: '#F8FAFC',
+              dark: '#1E293B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: '"Plus Jakarta Sans"', system-ui, sans-serif; }
     .badge-estudiantes { background-color: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
     .badge-docentes { background-color: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
     .badge-autenticacion { background-color: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
@@ -21,91 +42,109 @@
     .badge-reactivar { background-color: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen flex flex-col antialiased">
 
-  <!-- 1. Barra de Navegación Institucional Oficial -->
-  <header class="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+  <!-- 1. Cabecera Institucional con Navegación Adaptativa Móvil / Desktop -->
+  <header class="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
       
-      <!-- Marca y Escudo Institucional -->
-      <div class="flex items-center gap-3">
-        <a href="/estudiantes.html" class="flex items-center gap-2.5 group">
-          <div class="w-10 h-10 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center border border-white/20 transition-colors">
-            <span class="material-symbols-outlined text-emerald-400 text-2xl">verified_user</span>
+      <!-- Fila Superior: Marca y Perfil -->
+      <div class="h-14 sm:h-16 flex items-center justify-between gap-2">
+        <a href="/estudiantes.html" class="flex items-center gap-2 hover:opacity-95 shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+            <img src="/assets/srei-logo.png" alt="SREI" class="w-6 h-6 sm:w-7 sm:h-7 object-contain">
           </div>
-          <div>
-            <span class="text-lg font-extrabold tracking-tight block leading-tight">SREI</span>
-            <span class="text-[10px] text-white/70 uppercase tracking-widest hidden sm:block">Auditoría Institucional</span>
+          <div class="flex flex-col">
+            <span class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">SREI</span>
+            <span class="text-[9px] sm:text-[11px] text-white/80 font-medium">Educación Inclusiva</span>
           </div>
         </a>
-      </div>
 
-      <!-- Navegación entre Módulos -->
-      <nav class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
-        <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">school</span>
-          <span>Estudiantes</span>
-        </a>
-        <a href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">badge</span>
-          <span>Docentes</span>
-        </a>
-        <a href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base">history_edu</span>
-          <span>Bitácora</span>
-        </a>
-      </nav>
+        <!-- Navegación Desktop (Visible en md:) -->
+        <nav class="hidden md:flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+          <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Estudiantes</span>
+          </a>
+          <a href="/docentes.html" class="px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">badge</span>
+            <span>Docentes</span>
+          </a>
+          <a href="/bitacora.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Bitácora</span>
+          </a>
+        </nav>
 
-      <!-- Usuario Directora -->
-      <div class="flex items-center gap-2 pl-2 border-l border-white/20">
-        <div class="flex flex-col text-right hidden sm:flex">
-          <span class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
-          <span class="text-[10px] text-emerald-300 font-semibold">Directora del Servicio Especial de Educación Inclusiva</span>
+        <!-- Usuario Directora -->
+        <div class="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-white/20 shrink-0">
+          <div class="flex flex-col text-right hidden lg:flex">
+            <span class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
+            <span class="text-[10px] text-emerald-300 font-semibold">Directora de Educación Inclusiva</span>
+          </div>
+          <span class="lg:hidden bg-emerald-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Directora</span>
+          <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
+            <span class="material-symbols-outlined text-base">logout</span>
+          </button>
         </div>
-        <span class="sm:hidden bg-[#10B981] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Directora</span>
-        <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
-          <span class="material-symbols-outlined text-base">logout</span>
-        </button>
       </div>
+
+      <!-- Fila Inferior Móvil: Pestañas 100% completas y visibles sin recortes -->
+      <nav class="md:hidden pb-2.5 pt-0.5">
+        <div class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs gap-1">
+          <a href="/estudiantes.html" class="flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Estudiantes</span>
+          </a>
+          <a href="/docentes.html" class="flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">badge</span>
+            <span>Docentes</span>
+          </a>
+          <a href="/bitacora.html" class="flex-1 py-1.5 px-2 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center justify-center gap-1 text-center">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Bitácora</span>
+          </a>
+        </div>
+      </nav>
 
     </div>
   </header>
 
   <!-- 2. Contenido Principal -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-5">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col gap-4 sm:gap-5">
     
     <!-- Encabezado con Métricas Rápidas -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
       <div>
-        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+        <h1 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
           <span class="material-symbols-outlined text-[#1E3A8A] text-2xl sm:text-3xl">policy</span>
           Bitácora Institucional de Movimientos y Auditoría
         </h1>
         <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-          Registro inalterable de acciones administrativas, médicas, altas, bajas lógicas y descargas oficiales.
+          Auditoría de acciones administrativas, médicas, bajas lógicas, reactivaciones y descargas oficiales.
         </p>
       </div>
 
       <!-- Tarjetas de Resumen Numérico -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-3 shrink-0">
-        <div class="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs text-center">
-          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registros</span>
-          <span id="statTotal" class="text-base sm:text-lg font-black text-[#1E3A8A]">0</span>
+      <div class="grid grid-cols-3 gap-2 shrink-0">
+        <div class="bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200/90 shadow-2xs text-center">
+          <span class="block text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total</span>
+          <span id="statTotal" class="text-sm sm:text-lg font-black text-[#1E3A8A]">0</span>
         </div>
-        <div class="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs text-center">
-          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hoy</span>
-          <span id="statHoy" class="text-base sm:text-lg font-black text-emerald-600">0</span>
+        <div class="bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200/90 shadow-2xs text-center">
+          <span class="block text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hoy</span>
+          <span id="statHoy" class="text-sm sm:text-lg font-black text-emerald-600">0</span>
         </div>
-        <div class="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs text-center">
-          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Módulos</span>
-          <span id="statModulos" class="text-base sm:text-lg font-black text-indigo-600">0</span>
+        <div class="bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200/90 shadow-2xs text-center">
+          <span class="block text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Módulos</span>
+          <span id="statModulos" class="text-sm sm:text-lg font-black text-indigo-600">0</span>
         </div>
       </div>
     </div>
 
     <!-- Panel de Filtros y Búsqueda -->
-    <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col gap-3">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col gap-2.5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
         
         <!-- Búsqueda de Texto Libre -->
         <div class="lg:col-span-4 relative">
@@ -119,7 +158,7 @@
         </div>
 
         <!-- Filtro por Módulo -->
-        <div class="lg:col-span-2">
+        <div class="sm:col-span-1 lg:col-span-2">
           <select id="moduloFilter" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="todos">Todos los Módulos</option>
             <option value="ESTUDIANTES">Estudiantes</option>
@@ -131,24 +170,24 @@
         </div>
 
         <!-- Fecha Desde -->
-        <div class="lg:col-span-2">
+        <div class="sm:col-span-1 lg:col-span-2">
           <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
-            <label class="text-[10px] font-bold text-slate-500 uppercase">Desde:</label>
+            <label class="text-[10px] font-bold text-slate-500 uppercase shrink-0">Desde:</label>
             <input type="date" id="fechaDesde" class="w-full bg-transparent text-xs text-slate-700 focus:outline-none">
           </div>
         </div>
 
         <!-- Fecha Hasta -->
-        <div class="lg:col-span-2">
+        <div class="sm:col-span-1 lg:col-span-2">
           <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
-            <label class="text-[10px] font-bold text-slate-500 uppercase">Hasta:</label>
+            <label class="text-[10px] font-bold text-slate-500 uppercase shrink-0">Hasta:</label>
             <input type="date" id="fechaHasta" class="w-full bg-transparent text-xs text-slate-700 focus:outline-none">
           </div>
         </div>
 
         <!-- Botones de Acción de Filtro -->
-        <div class="lg:col-span-2 flex items-center gap-2">
-          <button id="btnFiltrar" class="flex-1 bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-bold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs">
+        <div class="sm:col-span-1 lg:col-span-2 flex items-center gap-2">
+          <button id="btnFiltrar" class="flex-1 bg-[#1E3A8A] hover:bg-blue-900 text-white font-bold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs">
             <span class="material-symbols-outlined text-base">filter_alt</span>
             <span>Filtrar</span>
           </button>
@@ -160,10 +199,10 @@
       </div>
     </div>
 
-    <!-- Tabla de Registros en Desktop y Cards en Móvil -->
+    <!-- Contenedor Principal: Tabla Desktop + Tarjetas Móviles Adaptativas -->
     <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden flex flex-col">
       
-      <!-- Vista de Tabla para Escritorio -->
+      <!-- Vista de Tabla para Escritorio (md en adelante) -->
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -182,18 +221,18 @@
         </table>
       </div>
 
-      <!-- Vista de Tarjetas para Móviles -->
+      <!-- Vista de Tarjetas para Móviles (< md) -->
       <div id="bitacoraMobileContainer" class="md:hidden divide-y divide-slate-100 p-2 space-y-2">
-        <!-- Tarjetas dinámicas -->
+        <!-- Tarjetas dinámicas móviles -->
       </div>
 
       <!-- Estado Vacío -->
-      <div id="emptyState" class="hidden py-16 text-center flex flex-col items-center justify-center gap-3">
-        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+      <div id="emptyState" class="hidden py-14 text-center flex flex-col items-center justify-center gap-3 px-4">
+        <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
           <span class="material-symbols-outlined text-3xl">manage_search</span>
         </div>
         <p class="text-sm font-semibold text-slate-700">No se encontraron movimientos con los filtros seleccionados.</p>
-        <p class="text-xs text-slate-400">Intenta ampliando el rango de fechas o eliminando el término de búsqueda.</p>
+        <p class="text-xs text-slate-400 max-w-sm">Intenta ampliando el rango de fechas o eliminando el término de búsqueda.</p>
       </div>
 
       <!-- Footer Informativo -->
@@ -311,7 +350,7 @@
         }
       }
 
-      // 5. Renderizado
+      // 5. Renderizado Adaptativo
       function renderBitacora(items) {
         tableBody.innerHTML = '';
         mobileContainer.innerHTML = '';
@@ -359,23 +398,23 @@
           `;
           tableBody.appendChild(tr);
 
-          // Card Móvil
+          // Card Móvil con Estilo Pulido y Sin Desbordamientos
           const card = document.createElement('div');
-          card.className = 'bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col gap-2';
+          card.className = 'bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col gap-2';
           card.innerHTML = `
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="font-mono text-slate-500 font-semibold">${fechaStr}</span>
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${moduloClass}">${log.modulo}</span>
+            <div class="flex items-center justify-between gap-2 text-[11px]">
+              <span class="font-mono text-slate-500 font-semibold text-[10px]">${fechaStr}</span>
+              <span class="px-2 py-0.5 rounded-md text-[9px] font-bold shrink-0 ${moduloClass}">${log.modulo}</span>
             </div>
-            <div class="text-xs font-semibold text-slate-900 leading-snug">
+            <div class="text-xs font-semibold text-slate-900 leading-snug break-words">
               ${escapeHtml(log.detalles)}
             </div>
-            <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
-              <span class="font-bold text-slate-700 flex items-center gap-1">
-                <span class="material-symbols-outlined text-xs text-slate-400">person</span>
-                ${escapeHtml(log.usuario_nombre || 'Directora')}
+            <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] gap-2">
+              <span class="font-bold text-slate-700 flex items-center gap-1 truncate">
+                <span class="material-symbols-outlined text-xs text-slate-400 shrink-0">person</span>
+                <span class="truncate">${escapeHtml(log.usuario_nombre || 'Directora')}</span>
               </span>
-              <span class="px-2 py-0.5 rounded text-[9px] font-bold ${accionClass}">${log.accion}</span>
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold shrink-0 ${accionClass}">${log.accion}</span>
             </div>
           `;
           mobileContainer.appendChild(card);
@@ -413,4 +452,3 @@
   </script>
 </body>
 </html>
-

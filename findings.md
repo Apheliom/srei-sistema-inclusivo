@@ -4,28 +4,19 @@
 - Servicio implementado en `src/services/bitacoraService.js`:
   - Firma: `registrarBitacora(req, accion, modulo, detalles, db, usuarioOverride = null)`
   - Registra: `usuario_id`, `usuario_nombre`, `usuario_email`, `usuario_rol`, `accion`, `modulo`, `detalles`, `ip_address`, `created_at`.
-- Tabla requerida en SQLite y Supabase PostgreSQL:
-  ```sql
-  CREATE TABLE IF NOT EXISTS bitacora (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario_id INTEGER,
-    usuario_nombre TEXT,
-    usuario_email TEXT,
-    usuario_rol TEXT,
-    accion TEXT NOT NULL,
-    modulo TEXT NOT NULL,
-    detalles TEXT NOT NULL,
-    ip_address TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-  ```
+- Tabla implementada y sincronizada en SQLite y Supabase PostgreSQL:
+  - Verificada en arranque con `pullFromSupabase`.
+  - Endpoint operativo: `GET /api/admin/bitacora`.
 
-## 2. Errores Identificados en Capturas de Pantalla del Usuario
-- **Render Error Environment Variable**: En la captura 2, el usuario pegó la URL de conexión completa `postgresql://...` en el campo **KEY** en lugar de poner `DATABASE_URL` en KEY y la URL en **VALUE**. Render rechazó la clave con el error: `Environment variable keys must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit`.
-- **GitHub Repository Missing Folders**: En la captura 1, el repositorio `Apheliom/srei-sistema-inclusivo` en GitHub solo contenía archivos sueltos de la raíz (`.env.example`, `.gitignore`, `README.md`, `package-lock.json`, `package.json`, `server.js`). Faltan completamente las carpetas `src/` y `public/`. Por eso Render falló con `Cannot find module './src/server.js'`.
-
-## 3. Plan de Integración
-1. Asegurar tabla `bitacora` en `src/db/database.js` y `src/db/supabase_sync.js`.
-2. Instrumentar rutas de `src/server.js` y habilitar endpoint `GET /api/admin/bitacora`.
-3. Crear vista `public/bitacora.html` y vincular pestañas de navegación en `estudiantes.html`, `admin.html` y `docentes.html`.
-4. Empaquetar el ZIP completo en el Escritorio con la estructura de carpetas lista para arrastrar o subir a GitHub.
+## 2. Diagnóstico de Problemas en Modo Móvil (Teléfono)
+- **Botones de Navegación Cortados / Desbordados**:
+  - En pantallas móviles (< 768px), el header intentaba colocar el logo, los 3 botones con texto e iconos largos, la información de usuario y el botón de logout en una sola fila `h-16 flex items-center justify-between`.
+  - Solución arquitectónica: Header adaptativo de 2 niveles en móvil: Nivel 1 con logo e identidad + logout; Nivel 2 con barra segmentada `grid grid-cols-3 gap-1` o `flex` de ancho completo, garantizando que los botones "Estudiantes", "Docentes" y "Bitácora" se lean completos y tengan área táctil óptima sin truncamiento.
+- **Bitácora HTML Bugueada en Móvil**:
+  - `public/bitacora.html` utilizaba `@tailwindcss/browser@4` que presentaba incompatibilidades con clases utilitarias y fallas en navegadores móviles.
+  - Se sustituye por el motor estable `tailwindcss 3` con plugins de formularios y configuración unificada idéntica a `estudiantes.html`.
+  - Reestructuración de tarjetas móviles, filtros responsive y espaciado adaptativo.
+- **Modal de "Nuevo Expediente" con Problemas de Tamaño**:
+  - En móviles, el contenedor `#formExpedienteModal` usaba `items-center` con `overflow-y-auto` en el wrapper y el modal, lo que causaba doble scroll, cortes en el encabezado y desbordamiento de botones en pantallas pequeñas.
+  - Se refactoriza a modal flex con encabezado fijo, cuerpo scrolleable y pie de acción fijo inferior ("Cancelar" y "Guardar Expediente" siempre a la vista sin scroll forzado).
+  - Los encabezados de bloques (como "+ Nuevo Plantel" y "Renombrar") se adaptan con `flex-col sm:flex-row` para evitar colisión con las etiquetas en pantallas estrechas.
