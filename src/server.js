@@ -819,6 +819,28 @@ app.post('/api/admin/profesores/:id/status', (req, res) => {
   }
 });
 
+// Eliminar Docente de forma definitiva (Local + Nube)
+app.delete('/api/admin/profesores/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    if (parseInt(id, 10) === 1) {
+      return res.status(403).json({ success: false, error: 'No se puede eliminar la cuenta principal de la Directora.' });
+    }
+    const targetUser = db.prepare('SELECT nombre_completo, email FROM usuarios WHERE id = ?').get(id);
+    if (!targetUser) return res.status(404).json({ success: false, error: 'Docente no encontrado.' });
+
+    db.prepare('DELETE FROM usuarios WHERE id = ?').run(id);
+    syncUsersToSupabase(db);
+
+    const targetInfo = `${targetUser.nombre_completo} (${targetUser.email})`;
+    registrarBitacora(req, 'ELIMINAR_DOCENTE', 'DOCENTES', `Docente ${targetInfo} eliminado del sistema y de la nube`, db);
+
+    res.json({ success: true, message: 'Docente eliminado exitosamente.' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ====================================================================
 // BITÁCORA INSTITUCIONAL DE AUDITORÍA (EXCLUSIVO DIRECTORA / MAGISTER AMPARO AGUILAR)
 // ====================================================================

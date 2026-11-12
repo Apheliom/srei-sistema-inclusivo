@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>SREI - Gestión de Estudiantes</title>
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script>
     tailwind.config = {
@@ -31,17 +35,19 @@
     };
   </script>
 </head>
+
 <body class="bg-[#F8FAFC] font-sans text-brand-dark min-h-screen flex flex-col antialiased">
 
   <!-- 1. Cabecera Institucional con Navegación Adaptativa según Rol -->
   <header class="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      
+
       <!-- Fila Superior: Marca Institucional y Usuario -->
       <div class="h-14 sm:h-16 flex items-center justify-between gap-2">
         <!-- Marca y Logotipo -->
         <a href="/estudiantes.html" class="flex items-center gap-2 hover:opacity-95 shrink-0">
-          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
+          <div
+            class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-white/20">
             <img src="/assets/srei-logo.png" alt="SREI" class="w-6 h-6 sm:w-7 sm:h-7 object-contain">
           </div>
           <div class="flex flex-col">
@@ -51,16 +57,20 @@
         </a>
 
         <!-- Navegación Desktop (Visible sólo en md:) -->
-        <nav id="topNavTabsDesktop" class="hidden md:flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
-          <a href="/estudiantes.html" class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
+        <nav id="topNavTabsDesktop"
+          class="hidden md:flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs sm:text-sm">
+          <a href="/estudiantes.html"
+            class="px-3 sm:px-4 py-1.5 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-base">school</span>
             <span>Estudiantes</span>
           </a>
-          <a href="/docentes.html" class="navDocentesTab px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
+          <a href="/docentes.html"
+            class="navDocentesTab px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-base">badge</span>
             <span>Docentes</span>
           </a>
-          <a href="/bitacora.html" class="navBitacoraTab px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5 hidden">
+          <a href="/bitacora.html"
+            class="navBitacoraTab px-3 sm:px-4 py-1.5 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center gap-1.5 hidden">
             <span class="material-symbols-outlined text-base">history_edu</span>
             <span>Bitácora</span>
           </a>
@@ -70,15 +80,20 @@
         <div class="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-white/20 shrink-0">
           <div id="userInfoHeader" class="flex flex-col text-right hidden lg:flex">
             <span id="headerUserName" class="text-xs font-bold text-white">Magister Amparo Aguilar</span>
-            <span id="headerUserSub" class="text-[10px] text-emerald-300 font-semibold">Directora de Educación Inclusiva</span>
+            <span id="headerUserSub" class="text-[10px] text-emerald-300 font-semibold">Directora de Educación
+              Inclusiva</span>
           </div>
-          
-          <button id="btnVerPerfil" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-white/20 transition-all cursor-pointer" title="Ver mi perfil">
+
+          <button id="btnVerPerfil"
+            class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-white/20 transition-all cursor-pointer"
+            title="Ver mi perfil">
             <span class="material-symbols-outlined text-base">account_circle</span>
             <span class="hidden sm:inline">Mi Perfil</span>
           </button>
 
-          <button id="adminLogoutBtn" class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Cerrar sesión">
+          <button id="adminLogoutBtn"
+            class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+            title="Cerrar sesión">
             <span class="material-symbols-outlined text-base">logout</span>
           </button>
         </div>
@@ -87,15 +102,18 @@
       <!-- Fila Inferior Móvil: Pestañas 100% legibles y completas (Visible sólo en móviles < md) -->
       <nav id="mobileNavTabs" class="md:hidden pb-2.5 pt-0.5">
         <div class="flex items-center bg-white/10 p-1 rounded-xl border border-white/15 text-xs gap-1">
-          <a href="/estudiantes.html" class="flex-1 py-1.5 px-2 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center justify-center gap-1 text-center">
+          <a href="/estudiantes.html"
+            class="flex-1 py-1.5 px-2 rounded-lg bg-white text-[#1E3A8A] font-bold shadow-xs transition-all flex items-center justify-center gap-1 text-center">
             <span class="material-symbols-outlined text-base">school</span>
             <span>Estudiantes</span>
           </a>
-          <a href="/docentes.html" class="navDocentesTab flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
+          <a href="/docentes.html"
+            class="navDocentesTab flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center">
             <span class="material-symbols-outlined text-base">badge</span>
             <span>Docentes</span>
           </a>
-          <a href="/bitacora.html" class="navBitacoraTab flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center hidden">
+          <a href="/bitacora.html"
+            class="navBitacoraTab flex-1 py-1.5 px-2 rounded-lg text-white/80 hover:text-white font-semibold transition-all flex items-center justify-center gap-1 text-center hidden">
             <span class="material-symbols-outlined text-base">history_edu</span>
             <span>Bitácora</span>
           </a>
@@ -109,16 +127,19 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-4">
 
     <!-- Banner si la cuenta del profesor está en espera de activación -->
-    <div id="bannerDocentePendiente" class="hidden bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-2xl flex items-center gap-3 shadow-2xs">
+    <div id="bannerDocentePendiente"
+      class="hidden bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-2xl flex items-center gap-3 shadow-2xs">
       <span class="material-symbols-outlined text-amber-600 text-2xl shrink-0">pending_actions</span>
       <div class="text-xs flex-1 leading-relaxed">
-        <strong class="font-bold text-amber-950">Cuenta en espera de aprobación:</strong> Tu registro docente fue exitoso. La Directora <strong>Magister Amparo Aguilar</strong> debe activar tu cuenta para permitir la creación y edición completa de expedientes. Mientras tanto, tu acceso es de modo consulta.
+        <strong class="font-bold text-amber-950">Cuenta en espera de aprobación:</strong> Tu registro docente fue
+        exitoso. La Directora <strong>Magister Amparo Aguilar</strong> debe activar tu cuenta para permitir la creación
+        y edición completa de expedientes. Mientras tanto, tu acceso es de modo consulta.
       </div>
     </div>
 
     <!-- Tarjeta Principal del Directorio de Estudiantes -->
     <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6 flex flex-col gap-4">
-      
+
       <!-- Título y Acciones de Cabecera -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
@@ -130,15 +151,22 @@
         </div>
 
         <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-end">
-          <button id="btnNuevoEstudiante" class="w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102">
+          <button id="btnNuevoEstudiante"
+            class="w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102">
             <span class="material-symbols-outlined text-base">person_add</span> Nuevo Estudiante
           </button>
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <button id="btnExportExcel" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs" title="Descargar reporte Excel institucional">
-              <span class="material-symbols-outlined text-base text-emerald-600">table_view</span> <span class="inline">Excel</span>
+            <button id="btnExportExcel"
+              class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              title="Descargar reporte Excel institucional">
+              <span class="material-symbols-outlined text-base text-emerald-600">table_view</span> <span
+                class="inline">Excel</span>
             </button>
-            <button id="btnExportPdf" class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs" title="Descargar reporte PDF oficial">
-              <span class="material-symbols-outlined text-base text-rose-600">picture_as_pdf</span> <span class="inline">PDF</span>
+            <button id="btnExportPdf"
+              class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              title="Descargar reporte PDF oficial">
+              <span class="material-symbols-outlined text-base text-rose-600">picture_as_pdf</span> <span
+                class="inline">PDF</span>
             </button>
           </div>
         </div>
@@ -148,18 +176,22 @@
       <div class="flex flex-col sm:flex-row gap-2">
         <div class="relative flex-1">
           <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">search</span>
-          <input type="text" id="filterSearch" placeholder="Buscar por nombre, cédula o representante..." class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+          <input type="text" id="filterSearch" placeholder="Buscar por nombre, cédula o representante..."
+            class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
         </div>
-        
-        <button id="btnToggleFiltros" class="sm:hidden px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-center gap-1 cursor-pointer">
+
+        <button id="btnToggleFiltros"
+          class="sm:hidden px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-center gap-1 cursor-pointer">
           <span class="material-symbols-outlined text-base">tune</span> Filtros
         </button>
 
         <div id="filtrosContainer" class="hidden sm:flex flex-col sm:flex-row gap-2">
-          <select id="filterPlantel" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+          <select id="filterPlantel"
+            class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
             <option value="">Todos los Planteles</option>
           </select>
-          <select id="filterCondicion" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+          <select id="filterCondicion"
+            class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
             <option value="">Todas las Condiciones</option>
             <option value="Dificultades para el aprendizaje">Dificultad de aprendizaje</option>
             <option value="Déficit Cognitivo">Déficit Cognitivo</option>
@@ -169,13 +201,15 @@
             <option value="Epilepsia / Convulsiones">Epilepsia / Convulsiones</option>
             <option value="Trastornos del Lenguaje">Trastornos del Lenguaje</option>
           </select>
-          <select id="filterEstatusDiag" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
+          <select id="filterEstatusDiag"
+            class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
             <option value="">Estatus Diagnóstico</option>
             <option value="Diagnóstico Médico Verificado">Verificado</option>
             <option value="En Proceso de Evaluación">En Proceso</option>
             <option value="Posible Proyección / Por Evaluar">Por Evaluar</option>
           </select>
-          <select id="filterEstado" class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50 font-semibold text-slate-700">
+          <select id="filterEstado"
+            class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50 font-semibold text-slate-700">
             <option value="activos">Expedientes Activos</option>
             <option value="inactivo">Histórico / Archivados</option>
             <option value="todos">Todos los Expedientes</option>
@@ -191,7 +225,8 @@
       <!-- VISTA COMPUTADORA: Tabla Densa y Completa (>= 768px) -->
       <div class="hidden md:block overflow-x-auto rounded-xl border border-slate-200">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-100/80 text-slate-700 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200">
+          <thead
+            class="bg-slate-100/80 text-slate-700 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200">
             <tr>
               <th class="py-3 px-3">N°</th>
               <th class="py-3 px-3">Estudiante</th>
@@ -212,7 +247,8 @@
       <div id="emptyState" class="hidden text-center py-10">
         <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">person_search</span>
         <p class="text-sm text-slate-600 font-semibold">No se encontraron estudiantes con los filtros aplicados.</p>
-        <p class="text-xs text-slate-400 mt-1">Prueba cambiando los criterios de búsqueda o registra un nuevo estudiante.</p>
+        <p class="text-xs text-slate-400 mt-1">Prueba cambiando los criterios de búsqueda o registra un nuevo
+          estudiante.</p>
       </div>
 
     </div>
@@ -238,7 +274,8 @@
               <div class="text-[11px] text-slate-500 font-medium">Total Estudiantes</div>
             </div>
           </div>
-          <div class="flex items-center gap-1.5 pt-1.5 border-t border-slate-100 text-[10px] sm:text-[11px] font-semibold flex-wrap">
+          <div
+            class="flex items-center gap-1.5 pt-1.5 border-t border-slate-100 text-[10px] sm:text-[11px] font-semibold flex-wrap">
             <span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md flex items-center gap-1">
               <span>👦</span> <span id="statVarones">0</span> Varones
             </span>
@@ -286,38 +323,49 @@
   </main>
 
   <!-- MODAL: FICHA DETALLADA DEL ESTUDIANTE -->
-  <div id="fichaModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 p-5 sm:p-6 text-left">
+  <div id="fichaModal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div
+      class="bg-white rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 p-5 sm:p-6 text-left">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <h3 class="text-base font-bold text-[#1E3A8A] flex items-center gap-1.5">
           <span class="material-symbols-outlined text-lg text-[#10B981]">badge</span>
           Ficha del Estudiante
         </h3>
-        <button id="closeFichaModal" class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+        <button id="closeFichaModal"
+          class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
+          title="Cerrar ventana">
           <span class="material-symbols-outlined text-base">close</span>
         </button>
       </div>
       <div id="fichaContent" class="mt-4 flex flex-col gap-3.5 text-xs sm:text-sm"></div>
       <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-        <button onclick="window.print()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1 cursor-pointer">
+        <button onclick="window.print()"
+          class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1 cursor-pointer">
           <span class="material-symbols-outlined text-sm">print</span> Imprimir
         </button>
-        <button id="btnCerrarFicha" class="px-4 py-1.5 text-xs font-bold text-white bg-[#1E3A8A] rounded-lg cursor-pointer">Cerrar</button>
+        <button id="btnCerrarFicha"
+          class="px-4 py-1.5 text-xs font-bold text-white bg-[#1E3A8A] rounded-lg cursor-pointer">Cerrar</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: NUEVO / EDITAR ESTUDIANTE (CON PLANTEL, CONDICIÓN RÁPIDA, CHECKLIST Y MEDICAMENTOS) -->
-  <div id="formExpedienteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[94vh] flex flex-col border border-slate-200 text-left overflow-hidden">
-      
+  <div id="formExpedienteModal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto">
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[94vh] flex flex-col border border-slate-200 text-left overflow-hidden">
+
       <!-- Cabecera Fija del Modal (Siempre visible) -->
-      <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
+      <div
+        class="px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-xl text-[#10B981]">person_add</span>
           <h3 id="formModalTitle" class="text-sm sm:text-base font-bold text-[#1E3A8A]">Registrar Nuevo Estudiante</h3>
         </div>
-        <button id="closeFormExpedienteModal" class="w-8 h-8 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+        <button id="closeFormExpedienteModal"
+          class="w-8 h-8 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
+          title="Cerrar ventana">
           <span class="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
@@ -330,52 +378,65 @@
         <div class="bg-slate-50/70 p-3 sm:p-3.5 rounded-xl border border-slate-200/80">
           <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">1. Identificación Institucional</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            
+
             <!-- Plantel con Botones de Crear y Renombrar Inline Adaptados para Móvil -->
             <div class="sm:col-span-2">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                 <label class="block font-semibold text-slate-700 text-xs">Institución de Procedencia / Plantel *</label>
                 <div class="flex items-center gap-1.5 self-start sm:self-auto">
-                  <button type="button" id="btnModalNuevoPlantel" class="text-[11px] font-bold text-[#1E3A8A] hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                  <button type="button" id="btnModalNuevoPlantel"
+                    class="text-[11px] font-bold text-[#1E3A8A] hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[13px]">add</span> + Nuevo Plantel
                   </button>
-                  <button type="button" id="btnModalEditarPlantel" class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                  <button type="button" id="btnModalEditarPlantel"
+                    class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[13px]">edit</span> Renombrar
                   </button>
                 </div>
               </div>
-              
+
               <!-- Formulario Inline para Crear o Renombrar Plantel -->
-              <div id="inlinePlantelPrompt" class="hidden mb-2 bg-blue-50 border border-blue-200 p-2.5 rounded-lg flex flex-col sm:flex-row items-center gap-2">
-                <input type="text" id="inlinePlantelInput" placeholder="Nombre completo de la Institución / Escuela..." class="flex-1 text-xs px-2.5 py-1.5 border border-blue-300 rounded bg-white w-full">
+              <div id="inlinePlantelPrompt"
+                class="hidden mb-2 bg-blue-50 border border-blue-200 p-2.5 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+                <input type="text" id="inlinePlantelInput" placeholder="Nombre completo de la Institución / Escuela..."
+                  class="flex-1 text-xs px-2.5 py-1.5 border border-blue-300 rounded bg-white w-full">
                 <div class="flex items-center gap-1.5 self-end sm:self-auto">
-                  <button type="button" id="btnGuardarPlantelInline" class="px-3 py-1 bg-[#1E3A8A] text-white text-xs font-bold rounded hover:bg-blue-900 transition-colors cursor-pointer">Guardar</button>
-                  <button type="button" id="btnCancelarPlantelInline" class="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300 transition-colors cursor-pointer">Cancelar</button>
+                  <button type="button" id="btnGuardarPlantelInline"
+                    class="px-3 py-1 bg-[#1E3A8A] text-white text-xs font-bold rounded hover:bg-blue-900 transition-colors cursor-pointer">Guardar</button>
+                  <button type="button" id="btnCancelarPlantelInline"
+                    class="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300 transition-colors cursor-pointer">Cancelar</button>
                 </div>
               </div>
 
-              <select id="formInstitucion" name="institucion_id" required class="w-full text-xs p-2 border rounded-lg bg-white"></select>
+              <select id="formInstitucion" name="institucion_id" required
+                class="w-full text-xs p-2 border rounded-lg bg-white"></select>
             </div>
 
             <div>
               <label class="block font-semibold mb-0.5">N° Orden / Matrícula</label>
-              <input type="number" id="formNumeroOrden" name="numero_orden" placeholder="Ej. 1" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="number" id="formNumeroOrden" name="numero_orden" placeholder="Ej. 1"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
-              <label class="block font-semibold mb-0.5">Cédula / Documento <span class="text-slate-400 font-normal">(Opcional)</span></label>
-              <input type="text" id="formCedula" name="cedula_identidad" placeholder="Dejar en blanco si aún no posee" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <label class="block font-semibold mb-0.5">Cédula / Documento <span
+                  class="text-slate-400 font-normal">(Opcional)</span></label>
+              <input type="text" id="formCedula" name="cedula_identidad" placeholder="Dejar en blanco si aún no posee"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div class="sm:col-span-2">
               <label class="block font-semibold mb-0.5">Nombres y Apellidos completos *</label>
-              <input type="text" id="formNombres" name="nombres_apellidos" required placeholder="Ej. José Ramón Riera Marrufo" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="text" id="formNombres" name="nombres_apellidos" required
+                placeholder="Ej. José Ramón Riera Marrufo" class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
               <label class="block font-semibold mb-0.5">Fecha de Nacimiento</label>
-              <input type="date" id="formFechaNac" name="fecha_nacimiento" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="date" id="formFechaNac" name="fecha_nacimiento"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
               <label class="block font-semibold mb-0.5">Edad Actual (Años)</label>
-              <input type="number" id="formEdad" name="edad" placeholder="Calculada o manual" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="number" id="formEdad" name="edad" placeholder="Calculada o manual"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
               <label class="block font-semibold mb-0.5">Sexo *</label>
@@ -386,7 +447,8 @@
             </div>
             <div>
               <label class="block font-semibold mb-0.5">Grado y Sección / Año *</label>
-              <input type="text" id="formGradoSeccion" name="grado_seccion" required placeholder="Ej. 1ero 'U', 4to 'A', 5to 'U'" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="text" id="formGradoSeccion" name="grado_seccion" required
+                placeholder="Ej. 1ero 'U', 4to 'A', 5to 'U'" class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
           </div>
         </div>
@@ -395,36 +457,45 @@
         <div class="bg-slate-50/70 p-3 sm:p-3.5 rounded-xl border border-slate-200/80">
           <h4 class="font-bold text-[#1E3A8A] text-xs uppercase mb-2">2. Condición Diagnóstica y Situación Especial</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            
+
             <!-- Selector dinámico de Condiciones Adaptado para Móvil -->
             <div class="sm:col-span-2">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                 <label class="block font-semibold text-slate-700 text-xs">Condición Principal / Diagnóstico *</label>
                 <div class="flex items-center gap-1.5 self-start sm:self-auto">
-                  <button type="button" id="btnModalNuevaCondicion" class="text-[11px] font-bold text-[#10B981] hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                  <button type="button" id="btnModalNuevaCondicion"
+                    class="text-[11px] font-bold text-[#10B981] hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[13px]">add</span> + Nueva Condición
                   </button>
-                  <button type="button" id="btnModalEditarCondicion" class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
+                  <button type="button" id="btnModalEditarCondicion"
+                    class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded transition-all flex items-center gap-0.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[13px]">edit</span> Renombrar
                   </button>
                 </div>
               </div>
 
               <!-- Formulario Inline para Crear o Renombrar Condición -->
-              <div id="inlineCondicionPrompt" class="hidden mb-2 bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg flex flex-col sm:flex-row items-center gap-2">
-                <input type="text" id="inlineCondicionInput" placeholder="Nombre de la condición diagnóstica (ej. Hipoacusia bilateral)..." class="flex-1 text-xs px-2.5 py-1.5 border border-emerald-300 rounded bg-white w-full">
+              <div id="inlineCondicionPrompt"
+                class="hidden mb-2 bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+                <input type="text" id="inlineCondicionInput"
+                  placeholder="Nombre de la condición diagnóstica (ej. Hipoacusia bilateral)..."
+                  class="flex-1 text-xs px-2.5 py-1.5 border border-emerald-300 rounded bg-white w-full">
                 <div class="flex items-center gap-1.5 self-end sm:self-auto">
-                  <button type="button" id="btnGuardarCondicionInline" class="px-3 py-1 bg-[#10B981] text-white text-xs font-bold rounded hover:bg-emerald-600 transition-colors cursor-pointer">Guardar</button>
-                  <button type="button" id="btnCancelarCondicionInline" class="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300 transition-colors cursor-pointer">Cancelar</button>
+                  <button type="button" id="btnGuardarCondicionInline"
+                    class="px-3 py-1 bg-[#10B981] text-white text-xs font-bold rounded hover:bg-emerald-600 transition-colors cursor-pointer">Guardar</button>
+                  <button type="button" id="btnCancelarCondicionInline"
+                    class="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300 transition-colors cursor-pointer">Cancelar</button>
                 </div>
               </div>
 
-              <select id="formCondicion" name="condicion" required class="w-full text-xs p-2 border rounded-lg bg-white"></select>
+              <select id="formCondicion" name="condicion" required
+                class="w-full text-xs p-2 border rounded-lg bg-white"></select>
             </div>
 
             <div class="sm:col-span-2">
               <label class="block font-semibold mb-0.5">Estatus Diagnóstico *</label>
-              <select id="formEstatusDiag" name="estatus_diagnostico" required class="w-full text-xs p-2 border rounded-lg bg-white">
+              <select id="formEstatusDiag" name="estatus_diagnostico" required
+                class="w-full text-xs p-2 border rounded-lg bg-white">
                 <option value="Diagnóstico Médico Verificado">Diagnóstico Médico Verificado</option>
                 <option value="En Proceso de Evaluación">En Proceso de Evaluación</option>
                 <option value="Posible Proyección / Por Evaluar">Posible Proyección / Por Evaluar</option>
@@ -433,7 +504,9 @@
 
             <div class="sm:col-span-2">
               <label class="block font-semibold mb-0.5">Observaciones y Acuerdos de Seguimiento</label>
-              <textarea id="formObservaciones" name="observaciones" rows="2" placeholder="Orientaciones pedagógicas, acuerdos multidisciplinarios (CAIPA, CDI, etc.)..." class="w-full text-xs p-2 border rounded-lg bg-white"></textarea>
+              <textarea id="formObservaciones" name="observaciones" rows="2"
+                placeholder="Orientaciones pedagógicas, acuerdos multidisciplinarios (CAIPA, CDI, etc.)..."
+                class="w-full text-xs p-2 border rounded-lg bg-white"></textarea>
             </div>
           </div>
         </div>
@@ -444,19 +517,24 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label class="block font-semibold mb-0.5">Nombre y Apellido del Representante</label>
-              <input type="text" id="formNombreRep" name="nombre_representante" placeholder="Ej. Juana Marrufo" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="text" id="formNombreRep" name="nombre_representante" placeholder="Ej. Juana Marrufo"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
-              <label class="block font-semibold mb-0.5">Cédula del Representante <span class="text-slate-400 font-normal">(Opcional)</span></label>
-              <input type="text" id="formCedulaRep" name="cedula_representante" placeholder="Ej. V-15432987" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <label class="block font-semibold mb-0.5">Cédula del Representante <span
+                  class="text-slate-400 font-normal">(Opcional)</span></label>
+              <input type="text" id="formCedulaRep" name="cedula_representante" placeholder="Ej. V-15432987"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
               <label class="block font-semibold mb-0.5">Teléfono Principal de Contacto</label>
-              <input type="tel" id="formTelefonoRep" name="telefono" placeholder="Ej. 0424-6016615" class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="tel" id="formTelefonoRep" name="telefono" placeholder="Ej. 0424-6016615"
+                class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
             <div>
               <label class="block font-semibold mb-0.5">Parentesco</label>
-              <input type="text" id="formParentesco" name="parentesco" value="Madre" placeholder="Madre, Padre, Tutor, Abuela..." class="w-full text-xs p-2 border rounded-lg bg-white">
+              <input type="text" id="formParentesco" name="parentesco" value="Madre"
+                placeholder="Madre, Padre, Tutor, Abuela..." class="w-full text-xs p-2 border rounded-lg bg-white">
             </div>
           </div>
         </div>
@@ -475,7 +553,8 @@
             <!-- Psicológica -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-2">
               <label for="formCheckPsico" class="w-24 font-bold text-slate-700 shrink-0">Psicológica:</label>
-              <select id="formCheckPsico" name="atencion_psicologica" class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
+              <select id="formCheckPsico" name="atencion_psicologica"
+                class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
                 <option value="No">No</option>
                 <option value="En proceso">En proceso</option>
                 <option value="Sí">Sí</option>
@@ -485,7 +564,8 @@
             <!-- Social -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-2">
               <label for="formCheckSocial" class="w-24 font-bold text-slate-700 shrink-0">Social:</label>
-              <select id="formCheckSocial" name="entrevista_social" class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
+              <select id="formCheckSocial" name="entrevista_social"
+                class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
                 <option value="Pendiente">Pendiente</option>
                 <option value="Realizada">Realizada</option>
               </select>
@@ -494,7 +574,8 @@
             <!-- Informe -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-2">
               <label for="formCheckInforme" class="w-24 font-bold text-slate-700 shrink-0">Informe:</label>
-              <select id="formCheckInforme" name="informe_integral" class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
+              <select id="formCheckInforme" name="informe_integral"
+                class="w-full sm:w-64 text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white font-medium text-slate-800 focus:ring-1 focus:ring-[#1E3A8A]">
                 <option value="Falta informe psicológico">Falta informe psicológico</option>
                 <option value="En proceso">En proceso</option>
                 <option value="Listo">Listo</option>
@@ -506,7 +587,7 @@
         <!-- 5. SECCIÓN FINAL DE MEDICAMENTOS (SWITCH / BOTÓN ABAJO DEL 4) -->
         <div class="bg-amber-50/60 p-3 sm:p-3.5 rounded-xl border border-amber-200 shadow-2xs flex flex-col gap-3">
           <input type="hidden" id="formTomaMedicamento" name="toma_medicamento" value="No">
-          
+
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
@@ -519,7 +600,8 @@
             </div>
 
             <!-- Switch Botón Interactivo Toggle -->
-            <button type="button" id="btnSwitchMedicamento" class="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-bold text-xs transition-all cursor-pointer bg-white text-slate-600 border-slate-300 hover:bg-slate-50">
+            <button type="button" id="btnSwitchMedicamento"
+              class="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-bold text-xs transition-all cursor-pointer bg-white text-slate-600 border-slate-300 hover:bg-slate-50">
               <span id="switchMedIcon" class="material-symbols-outlined text-sm text-slate-400">toggle_off</span>
               <span id="switchMedLabel">No</span>
             </button>
@@ -527,59 +609,77 @@
 
           <!-- Bloque Desplegable de Especificaciones Médicas -->
           <div id="bloqueMedicamentos" class="hidden pt-2.5 border-t border-amber-200 flex flex-col gap-1.5">
-            <label class="block font-bold text-amber-900 text-xs">Especificaciones del Medicamento y Protocolo Escolar *</label>
-            <p class="text-[11px] text-amber-800">Indica el nombre del medicamento, dosis, horario y protocolo a seguir en el plantel escolar.</p>
-            <textarea id="formMedicamentoDetalles" name="medicamento_detalles" rows="3" placeholder="Ej. Fenobarbital 100mg (1 tableta cada 12 horas). Mantener en resguardo en dirección. En caso de crisis convulsiva seguir protocolo de emergencia..." class="w-full text-xs p-2.5 border border-amber-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500"></textarea>
+            <label class="block font-bold text-amber-900 text-xs">Especificaciones del Medicamento y Protocolo Escolar
+              *</label>
+            <p class="text-[11px] text-amber-800">Indica el nombre del medicamento, dosis, horario y protocolo a seguir
+              en el plantel escolar.</p>
+            <textarea id="formMedicamentoDetalles" name="medicamento_detalles" rows="3"
+              placeholder="Ej. Fenobarbital 100mg (1 tableta cada 12 horas). Mantener en resguardo en dirección. En caso de crisis convulsiva seguir protocolo de emergencia..."
+              class="w-full text-xs p-2.5 border border-amber-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500"></textarea>
           </div>
         </div>
 
         <!-- Botones de Acción (Fijos en parte inferior del modal) -->
-        <div class="sticky bottom-0 bg-white/95 backdrop-blur-xs pt-3 pb-1 -mb-1 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0 z-10">
-          <button type="button" id="btnCancelExpediente" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer">Cancelar</button>
-          <button type="submit" id="btnSaveExpediente" class="px-5 py-2 text-xs font-bold text-white bg-[#1E3A8A] hover:bg-blue-900 rounded-xl shadow-xs cursor-pointer">Guardar Expediente</button>
+        <div
+          class="sticky bottom-0 bg-white/95 backdrop-blur-xs pt-3 pb-1 -mb-1 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0 z-10">
+          <button type="button" id="btnCancelExpediente"
+            class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer">Cancelar</button>
+          <button type="submit" id="btnSaveExpediente"
+            class="px-5 py-2 text-xs font-bold text-white bg-[#1E3A8A] hover:bg-blue-900 rounded-xl shadow-xs cursor-pointer">Guardar
+            Expediente</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- MODAL: PERFIL DEL PROFESOR / USUARIO CON EDICIÓN Y CONTRASEÑA OBLIGATORIA -->
-  <div id="perfilUsuarioModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-200 p-5 text-left max-h-[92vh] overflow-y-auto">
+  <div id="perfilUsuarioModal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+    <div
+      class="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-200 p-5 text-left max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <h3 class="text-sm font-bold text-[#1E3A8A] flex items-center gap-1.5">
           <span class="material-symbols-outlined text-lg text-[#10B981]">badge</span>
           Perfil Docente
         </h3>
-        <button id="closePerfilModal" class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer" title="Cerrar ventana">
+        <button id="closePerfilModal"
+          class="w-7 h-7 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
+          title="Cerrar ventana">
           <span class="material-symbols-outlined text-base">close</span>
         </button>
       </div>
 
       <form id="perfilForm" class="mt-4 flex flex-col gap-3.5 text-xs">
         <div class="flex flex-col items-center text-center pb-2 border-b border-slate-100">
-          <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1.5 border-2 border-emerald-300">
+          <div
+            class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1.5 border-2 border-emerald-300">
             <span class="material-symbols-outlined text-2xl">school</span>
           </div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold" id="perfilEstadoBadge"></div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+            id="perfilEstadoBadge"></div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1" for="perfilEditNombre">Nombre Completo *</label>
-          <input type="text" id="perfilEditNombre" required class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+          <input type="text" id="perfilEditNombre" required
+            class="w-full p-2 border border-slate-300 rounded-lg bg-white">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1" for="perfilEditEmail">Correo Electrónico *</label>
-          <input type="email" id="perfilEditEmail" required class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+          <input type="email" id="perfilEditEmail" required
+            class="w-full p-2 border border-slate-300 rounded-lg bg-white">
         </div>
 
         <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
           <div class="font-bold text-slate-700 text-xs flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm text-[#1E3A8A]">lock_reset</span> Cambio de Contraseña (Opcional)
+            <span class="material-symbols-outlined text-sm text-[#1E3A8A]">lock_reset</span> Cambio de Contraseña
+            (Opcional)
           </div>
           <div>
             <label class="block text-[11px] text-slate-500 mb-0.5" for="perfilEditNewPass">Nueva Contraseña</label>
-            <input type="password" id="perfilEditNewPass" placeholder="Dejar en blanco para no cambiar" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+            <input type="password" id="perfilEditNewPass" placeholder="Dejar en blanco para no cambiar"
+              class="w-full p-2 border border-slate-300 rounded-lg bg-white">
           </div>
         </div>
 
@@ -588,15 +688,19 @@
           <label class="block font-bold text-rose-950 text-xs mb-1" for="perfilCurrentPass">
             Ingresa tu Contraseña Actual *
           </label>
-          <p class="text-[10px] text-rose-800 mb-1.5">Requerido obligatoriamente para autorizar y guardar cualquier cambio.</p>
-          <input type="password" id="perfilCurrentPass" required placeholder="Contraseña actual" class="w-full p-2 border border-rose-300 rounded-lg bg-white focus:ring-2 focus:ring-rose-500">
+          <p class="text-[10px] text-rose-800 mb-1.5">Requerido obligatoriamente para autorizar y guardar cualquier
+            cambio.</p>
+          <input type="password" id="perfilCurrentPass" required placeholder="Contraseña actual"
+            class="w-full p-2 border border-rose-300 rounded-lg bg-white focus:ring-2 focus:ring-rose-500">
         </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-          <button type="button" id="perfilLogoutBtn" class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 font-bold text-xs rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+          <button type="button" id="perfilLogoutBtn"
+            class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 font-bold text-xs rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
             <span class="material-symbols-outlined text-sm">logout</span> Salir
           </button>
-          <button type="submit" id="btnGuardarPerfil" class="px-4 py-2 bg-[#1E3A8A] hover:bg-blue-900 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer">
+          <button type="submit" id="btnGuardarPerfil"
+            class="px-4 py-2 bg-[#1E3A8A] hover:bg-blue-900 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer">
             Guardar Cambios
           </button>
         </div>
@@ -613,7 +717,7 @@
       let currentUser = null;
       try {
         currentUser = userStr ? JSON.parse(userStr) : null;
-      } catch (e) {}
+      } catch (e) { }
 
       // Si no hay usuario guardado, cargar perfil Directora por defecto
       if (!currentUser) {
@@ -1003,10 +1107,10 @@
 
         items.forEach((item, index) => {
           // Badges de Checklist
-          const badgePsico = item.atencion_psicologica === 'Sí' 
-            ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Atención Psicológica: Sí">PSI ✓</span>' 
+          const badgePsico = item.atencion_psicologica === 'Sí'
+            ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Atención Psicológica: Sí">PSI ✓</span>'
             : '<span class="bg-slate-100 text-slate-500 text-[10px] px-1.5 py-0.5 rounded" title="Atención Psicológica: Pendiente">PSI -</span>';
-          
+
           const badgeSocial = item.entrevista_social === 'Realizada'
             ? '<span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Entrevista Social: Realizada">SOC ✓</span>'
             : '<span class="bg-slate-100 text-slate-500 text-[10px] px-1.5 py-0.5 rounded" title="Entrevista Social: Pendiente">SOC -</span>';
@@ -1018,8 +1122,8 @@
           const estatusColor = item.estatus_diagnostico === 'Diagnóstico Médico Verificado'
             ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
             : item.estatus_diagnostico === 'En Proceso de Evaluación'
-            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-            : 'bg-blue-50 text-blue-800 border border-blue-200';
+              ? 'bg-amber-50 text-amber-800 border border-amber-200'
+              : 'bg-blue-50 text-blue-800 border border-blue-200';
 
           const telefonoLink = item.telefono && item.telefono !== 'No especificado'
             ? `<a href="https://wa.me/58${item.telefono.replace(/\D/g, '')}" target="_blank" class="text-emerald-700 font-semibold hover:underline inline-flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">chat</span> ${escapeHtml(item.telefono)}</a>`
@@ -1068,10 +1172,10 @@
                   <span class="material-symbols-outlined text-base">edit</span>
                 </button>
                 ${isDirector ? (
-                  item.activo === 0
-                    ? `<button onclick="reactivarEstudiante(${item.id})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer" title="Reactivar Expediente"><span class="material-symbols-outlined text-base">restore_from_trash</span></button>`
-                    : `<button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Desactivar / Archivar"><span class="material-symbols-outlined text-base">archive</span></button>`
-                ) : ''}
+              item.activo === 0
+                ? `<button onclick="reactivarEstudiante(${item.id})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer" title="Reactivar Expediente"><span class="material-symbols-outlined text-base">restore_from_trash</span></button>`
+                : `<button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Desactivar / Archivar"><span class="material-symbols-outlined text-base">archive</span></button>`
+            ) : ''}
               </div>
             </td>
           `;
@@ -1119,10 +1223,10 @@
                   <span class="material-symbols-outlined text-sm">edit</span> Editar
                 </button>
                 ${isDirector ? (
-                  item.activo === 0
-                    ? `<button onclick="reactivarEstudiante(${item.id})" class="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 cursor-pointer" title="Reactivar"><span class="material-symbols-outlined text-sm">restore_from_trash</span> Reactivar</button>`
-                    : `<button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors" title="Desactivar / Archivar"><span class="material-symbols-outlined text-sm">archive</span></button>`
-                ) : ''}
+              item.activo === 0
+                ? `<button onclick="reactivarEstudiante(${item.id})" class="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 cursor-pointer" title="Reactivar"><span class="material-symbols-outlined text-sm">restore_from_trash</span> Reactivar</button>`
+                : `<button onclick="eliminarEstudiante(${item.id})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors" title="Desactivar / Archivar"><span class="material-symbols-outlined text-sm">archive</span></button>`
+            ) : ''}
               </div>
             </div>
           `;
@@ -1138,7 +1242,7 @@
         const estatus = filterEstatusDiag.value;
 
         const filtered = expedientesList.filter(item => {
-          const matchQuery = !query || 
+          const matchQuery = !query ||
             (item.nombres_apellidos && item.nombres_apellidos.toLowerCase().includes(query)) ||
             (item.cedula_identidad && item.cedula_identidad.toLowerCase().includes(query)) ||
             (item.nombre_representante && item.nombre_representante.toLowerCase().includes(query));
@@ -1165,7 +1269,7 @@
       });
 
       // 10. Ver Ficha Completa
-      window.verFicha = function(id) {
+      window.verFicha = function (id) {
         const item = expedientesList.find(x => x.id === id);
         if (!item) return;
 
@@ -1252,7 +1356,7 @@
         form.reset();
         document.getElementById('editExpedienteId').value = '';
         formModalTitle.textContent = 'Registrar Nuevo Estudiante';
-        
+
         // Reset checklist y medicamentos con valores por defecto
         formCheckPsico.value = 'No';
         formCheckSocial.value = 'Pendiente';
@@ -1262,7 +1366,7 @@
         formModal.classList.remove('hidden');
       });
 
-      window.editarEstudiante = function(id) {
+      window.editarEstudiante = function (id) {
         if (isDocentePendiente) {
           alert('Tu cuenta de docente está en espera de aprobación por la Dirección.');
           return;
@@ -1348,7 +1452,7 @@
       });
 
       // 13. Desactivar / Borrado Lógico de Estudiante (Sólo Admin / Directora)
-      window.eliminarEstudiante = async function(id) {
+      window.eliminarEstudiante = async function (id) {
         if (!confirm('¿Deseas desactivar y archivar este expediente? El registro quedará resguardado en el historial y podrá ser reactivado si el estudiante regresa.')) return;
         try {
           const res = await fetch(`/api/expedientes/${id}`, { method: 'DELETE' });
@@ -1365,7 +1469,7 @@
       };
 
       // 13.b Reactivar Estudiante Archivado
-      window.reactivarEstudiante = async function(id) {
+      window.reactivarEstudiante = async function (id) {
         if (!confirm('¿Deseas reactivar este expediente estudiantil? Volverá a estar activo en las listas y estadísticas generales.')) return;
         try {
           const res = await fetch(`/api/expedientes/${id}/reactivar`, { method: 'POST' });
@@ -1475,4 +1579,5 @@
     });
   </script>
 </body>
+
 </html>

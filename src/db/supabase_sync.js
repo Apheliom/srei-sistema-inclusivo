@@ -84,16 +84,24 @@ async function pullFromSupabase(db) {
       }
     } catch (e) { /* tabla opcional en versiones previas */ }
 
-    // 3. Usuarios
+    // 3. Usuarios (Refleja eliminaciones de la nube en local)
     const resUsers = await client.query('SELECT id, email, nombre_completo, password_hash, rol, estado, email_verificado FROM public.usuarios ORDER BY id ASC');
     if (resUsers.rows.length > 0) {
+      const supaUserIds = resUsers.rows.map(u => u.id);
+      db.prepare(`DELETE FROM usuarios WHERE id != 1 AND id NOT IN (${supaUserIds.join(',')})`).run();
+
       const userStmt = db.prepare('INSERT OR REPLACE INTO usuarios (id, email, nombre_completo, password_hash, rol, estado, email_verificado) VALUES (?, ?, ?, ?, ?, ?, ?)');
       for (const r of resUsers.rows) userStmt.run(r.id, r.email, r.nombre_completo, r.password_hash, r.rol, r.estado, r.email_verificado);
     }
 
-    // 4. Estudiantes
+    // 4. Estudiantes (Refleja eliminaciones de la nube en local)
     const resEst = await client.query('SELECT id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, COALESCE(activo, 1) as activo, registrado_por FROM public.estudiantes ORDER BY id ASC');
     if (resEst.rows.length > 0) {
+      const supaEstIds = resEst.rows.map(e => e.id);
+      db.prepare(`DELETE FROM estudiantes WHERE id NOT IN (${supaEstIds.join(',')})`).run();
+      db.prepare(`DELETE FROM expedientes_medicos WHERE estudiante_id NOT IN (${supaEstIds.join(',')})`).run();
+      db.prepare(`DELETE FROM representantes WHERE estudiante_id NOT IN (${supaEstIds.join(',')})`).run();
+
       const estStmt = db.prepare('INSERT OR REPLACE INTO estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
       for (const r of resEst.rows) {
         const fecha = r.fecha_nacimiento instanceof Date ? r.fecha_nacimiento.toISOString().split('T')[0] : r.fecha_nacimiento;
@@ -180,6 +188,10 @@ async function syncTableToSupabase(tableName, db) {
         }
       } else if (tableName === 'usuarios') {
         const rows = db.prepare('SELECT * FROM usuarios').all();
+        const localIds = rows.map(r => r.id);
+        if (localIds.length > 0) {
+          await client.query(`DELETE FROM public.usuarios WHERE id NOT IN (${localIds.join(',')})`);
+        }
         for (const r of rows) {
           await client.query(
             `INSERT INTO public.usuarios (id, email, nombre_completo, password_hash, rol, estado, email_verificado)

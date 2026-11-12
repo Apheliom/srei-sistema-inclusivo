@@ -283,8 +283,8 @@
         // Móvil
         mobileDocentesContainer.innerHTML = list.map(t => {
           const btn = t.estado === 'activo'
-            ? `<button onclick="cambiarEstadoDocente(${t.id}, 'inactivo')" class="w-full py-1.5 px-3 text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg">Desactivar Acceso</button>`
-            : `<button onclick="cambiarEstadoDocente(${t.id}, 'activo')" class="w-full py-1.5 px-3 text-xs font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-lg shadow-xs">✓ Aprobar y Activar Cuenta</button>`;
+            ? `<button onclick="cambiarEstadoDocente(${t.id}, 'inactivo')" class="flex-1 py-1.5 px-3 text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg">Desactivar Acceso</button>`
+            : `<button onclick="cambiarEstadoDocente(${t.id}, 'activo')" class="flex-1 py-1.5 px-3 text-xs font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-lg shadow-xs">✓ Aprobar Cuenta</button>`;
 
           return `
             <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col gap-2">
@@ -295,8 +295,11 @@
                 </div>
                 ${getStatusBadge(t.estado)}
               </div>
-              <div class="pt-2 border-t border-slate-100 mt-1">
+              <div class="pt-2 border-t border-slate-100 mt-1 flex items-center gap-2">
                 ${btn}
+                <button onclick="eliminarDocente(${t.id}, '${escapeHtml(t.nombre_completo)}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200" title="Eliminar docente">
+                  <span class="material-symbols-outlined text-base">delete</span>
+                </button>
               </div>
             </div>
           `;
@@ -313,7 +316,14 @@
               <td class="py-3 px-4 font-bold text-[#1E3A8A] text-xs sm:text-sm">${escapeHtml(t.nombre_completo)}</td>
               <td class="py-3 px-4 text-slate-600 text-xs sm:text-sm font-mono">${escapeHtml(t.email)}</td>
               <td class="py-3 px-4">${getStatusBadge(t.estado)}</td>
-              <td class="py-3 px-4 text-center">${btn}</td>
+              <td class="py-3 px-4 text-center">
+                <div class="inline-flex items-center gap-2">
+                  ${btn}
+                  <button onclick="eliminarDocente(${t.id}, '${escapeHtml(t.nombre_completo)}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200 transition-colors" title="Eliminar definitivamente">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </div>
+              </td>
             </tr>
           `;
         }).join('');
@@ -343,6 +353,23 @@
             loadStats();
           }
         } catch { alert('Error al actualizar estado'); }
+      };
+
+      window.eliminarDocente = async function(id, nombre) {
+        if (!confirm(`¿Deseas eliminar permanentemente la cuenta del docente "${nombre}"? Esta acción se sincronizará con la nube de Supabase.`)) return;
+        try {
+          const res = await fetch(`/api/admin/profesores/${id}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            alert(data.message);
+            loadDocentes();
+            loadStats();
+          } else {
+            alert(data.error || 'Error al eliminar');
+          }
+        } catch (e) {
+          alert('Error al procesar eliminación: ' + e.message);
+        }
       };
 
       function escapeHtml(str) {
