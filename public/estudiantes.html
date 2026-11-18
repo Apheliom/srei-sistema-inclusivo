@@ -168,6 +168,12 @@
               <span class="material-symbols-outlined text-base text-rose-600">picture_as_pdf</span> <span
                 class="inline">PDF</span>
             </button>
+            <button id="btnExportSql"
+              class="hidden flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm font-semibold text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl transition-colors items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              title="Descargar respaldo SQL en vivo de Supabase">
+              <span class="material-symbols-outlined text-base text-sky-600">database</span> <span
+                class="inline">Copia SQL</span>
+            </button>
           </div>
         </div>
       </div>
@@ -189,6 +195,12 @@
           <select id="filterPlantel"
             class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
             <option value="">Todos los Planteles</option>
+          </select>
+          <select id="filterDocente"
+            class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50 font-semibold text-slate-700">
+            <option value="">Todos los Docentes</option>
+            <option value="yo">Mis Estudiantes</option>
+            <option value="sin_asignar">Sin Docente Asignado</option>
           </select>
           <select id="filterCondicion"
             class="text-xs px-2.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] bg-slate-50/50">
@@ -449,6 +461,13 @@
               <label class="block font-semibold mb-0.5">Grado y Sección / Año *</label>
               <input type="text" id="formGradoSeccion" name="grado_seccion" required
                 placeholder="Ej. 1ero 'U', 4to 'A', 5to 'U'" class="w-full text-xs p-2 border rounded-lg bg-white">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-semibold mb-0.5">Docente Responsable / Profesor Asignado</label>
+              <select id="formDocenteAsignado" name="docente_id" class="w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
+                <option value="">Ninguno de los anteriores / Sin asignar</option>
+              </select>
+              <span class="text-[10px] text-slate-500 mt-0.5 block">Selecciona un docente registrado, la cuenta Directora (admin), o déjalo sin asignar.</span>
             </div>
           </div>
         </div>
@@ -732,8 +751,8 @@
       }
 
       const isDirector = currentUser.rol === 'admin';
-      const isDocente = currentUser.rol === 'docente';
-      const isDocentePendiente = isDocente && currentUser.estado === 'pendiente_aprobacion';
+      const isDocente = currentUser.rol === 'profesor' || currentUser.rol === 'docente';
+      const isDocentePendiente = isDocente && (currentUser.estado === 'pendiente' || currentUser.estado === 'pendiente_aprobacion');
 
       // 2. Adaptar Interfaz según Rol
       const docTabs = document.querySelectorAll('.navDocentesTab');
@@ -743,6 +762,7 @@
       const btnVerPerfil = document.getElementById('btnVerPerfil');
       const bannerDocentePendiente = document.getElementById('bannerDocentePendiente');
       const btnNuevoEstudiante = document.getElementById('btnNuevoEstudiante');
+      const btnExportSql = document.getElementById('btnExportSql');
 
       if (isDirector) {
         docTabs.forEach(el => el.classList.remove('hidden'));
@@ -750,6 +770,13 @@
         if (headerUserName) headerUserName.textContent = 'Magister Amparo Aguilar';
         if (headerUserSub) headerUserSub.textContent = 'Directora del Servicio Especial de Educación Inclusiva';
         btnVerPerfil.classList.add('hidden');
+        if (btnExportSql) {
+          btnExportSql.classList.remove('hidden');
+          btnExportSql.classList.add('flex');
+          btnExportSql.addEventListener('click', () => {
+            window.location.href = '/api/export/supabase';
+          });
+        }
       } else {
         // Rol Docente
         docTabs.forEach(el => el.classList.add('hidden')); // Ocultar pestañas de docentes
@@ -1059,6 +1086,50 @@
         }
       }
 
+      // Cargar Lista de Docentes para Selector de Asignación y Filtros
+      let docentesListaGlobal = [];
+      async function loadDocentesLista() {
+        try {
+          const res = await fetch('/api/docentes-lista');
+          const json = await res.json();
+          if (json.success) {
+            docentesListaGlobal = json.data;
+
+            const filterDocente = document.getElementById('filterDocente');
+            if (filterDocente) {
+              const currentVal = filterDocente.value;
+              filterDocente.innerHTML = `
+                <option value="">Todos los Docentes</option>
+                <option value="yo">Mis Estudiantes</option>
+                <option value="sin_asignar">Sin Docente Asignado</option>
+              `;
+              docentesListaGlobal.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = `${d.nombre_completo}${d.rol === 'admin' ? ' (Directora)' : ''}`;
+                filterDocente.appendChild(opt);
+              });
+              if (currentVal) filterDocente.value = currentVal;
+            }
+
+            const formDocente = document.getElementById('formDocenteAsignado');
+            if (formDocente) {
+              const currentVal = formDocente.value;
+              formDocente.innerHTML = `<option value="">Ninguno de los anteriores / Sin asignar</option>`;
+              docentesListaGlobal.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = `${d.nombre_completo}${d.rol === 'admin' ? ' (Directora)' : ' (Profesor)'}`;
+                formDocente.appendChild(opt);
+              });
+              if (currentVal) formDocente.value = currentVal;
+            }
+          }
+        } catch (e) {
+          console.error('Error cargando docentes lista', e);
+        }
+      }
+
       async function loadStats() {
         try {
           const res = await fetch('/api/stats');
@@ -1147,6 +1218,9 @@
             <td class="py-3 px-3">
               <div class="font-semibold text-slate-800 truncate max-w-[160px]" title="${escapeHtml(item.nombre_institucion)}">${escapeHtml(item.nombre_institucion)}</div>
               <div class="text-[11px] text-slate-500 font-bold">${escapeHtml(item.grado_seccion)}</div>
+              <div class="text-[10px] text-indigo-700 font-semibold flex items-center gap-1 mt-0.5 truncate max-w-[160px]" title="Docente Asignado">
+                <span class="material-symbols-outlined text-[12px]">school</span> ${item.docente_nombre ? escapeHtml(item.docente_nombre) : '<span class="text-slate-400 font-normal italic">Sin docente</span>'}
+              </div>
             </td>
             <td class="py-3 px-3">
               <div class="font-bold text-slate-800">${escapeHtml(item.condicion)}</div>
@@ -1205,6 +1279,7 @@
 
             <div class="text-xs text-slate-700">
               <div class="truncate"><span class="text-slate-400 font-medium">Plantel:</span> <strong>${escapeHtml(item.nombre_institucion)}</strong></div>
+              <div class="truncate"><span class="text-slate-400 font-medium">Docente:</span> <strong class="text-indigo-800">${item.docente_nombre ? escapeHtml(item.docente_nombre) : '<span class="text-slate-400 font-normal italic">Sin docente asignado</span>'}</strong></div>
               <div><span class="text-slate-400 font-medium">Condición:</span> <strong class="text-[#1E3A8A]">${escapeHtml(item.condicion)}</strong></div>
               <div><span class="text-slate-400 font-medium">Representante:</span> ${escapeHtml(item.nombre_representante)} (${telefonoLink})</div>
             </div>
@@ -1240,6 +1315,8 @@
         const inst = filterPlantel.value;
         const cond = filterCondicion.value.toLowerCase();
         const estatus = filterEstatusDiag.value;
+        const filterDocente = document.getElementById('filterDocente');
+        const docFiltro = filterDocente ? filterDocente.value : '';
 
         const filtered = expedientesList.filter(item => {
           const matchQuery = !query ||
@@ -1251,7 +1328,17 @@
           const matchCond = !cond || (item.condicion && item.condicion.toLowerCase().includes(cond));
           const matchEstatus = !estatus || item.estatus_diagnostico === estatus;
 
-          return matchQuery && matchInst && matchCond && matchEstatus;
+          let matchDocente = true;
+          if (docFiltro === 'yo') {
+            matchDocente = (item.docente_id && String(item.docente_id) === String(currentUser.id)) ||
+                           (!item.docente_id && item.registrado_por && String(item.registrado_por) === String(currentUser.id));
+          } else if (docFiltro === 'sin_asignar') {
+            matchDocente = !item.docente_id || item.docente_id === 0;
+          } else if (docFiltro) {
+            matchDocente = item.docente_id && String(item.docente_id) === String(docFiltro);
+          }
+
+          return matchQuery && matchInst && matchCond && matchEstatus && matchDocente;
         });
 
         renderEstudiantes(filtered);
@@ -1261,6 +1348,8 @@
       filterPlantel.addEventListener('change', filterData);
       filterCondicion.addEventListener('change', filterData);
       filterEstatusDiag.addEventListener('change', filterData);
+      const filterDocenteEl = document.getElementById('filterDocente');
+      if (filterDocenteEl) filterDocenteEl.addEventListener('change', filterData);
       const filterEstado = document.getElementById('filterEstado');
       if (filterEstado) filterEstado.addEventListener('change', loadExpedientes);
 
@@ -1286,7 +1375,8 @@
               <div><span class="text-slate-500">Cédula:</span> <strong class="font-mono">${escapeHtml(item.cedula_identidad)}</strong></div>
               <div><span class="text-slate-500">Fecha Nac:</span> <strong>${item.fecha_nacimiento || '—'}</strong></div>
               <div><span class="text-slate-500">Edad / Sexo:</span> <strong>${item.edad_calculada} años (${item.sexo})</strong></div>
-              <div class="col-span-2"><span class="text-slate-500">Grado y Sección:</span> <strong>${escapeHtml(item.grado_seccion)}</strong></div>
+              <div><span class="text-slate-500">Grado y Sección:</span> <strong>${escapeHtml(item.grado_seccion)}</strong></div>
+              <div><span class="text-slate-500">Docente Responsable:</span> <strong class="text-indigo-800">${item.docente_nombre ? escapeHtml(item.docente_nombre) : '<span class="text-slate-400 font-normal italic">Sin docente asignado</span>'}</strong></div>
             </div>
           </div>
 
@@ -1357,6 +1447,12 @@
         document.getElementById('editExpedienteId').value = '';
         formModalTitle.textContent = 'Registrar Nuevo Estudiante';
 
+        // Preseleccionar al docente actual si es profesor
+        const formDocente = document.getElementById('formDocenteAsignado');
+        if (formDocente) {
+          formDocente.value = (currentUser && currentUser.rol === 'profesor') ? currentUser.id : '';
+        }
+
         // Reset checklist y medicamentos con valores por defecto
         formCheckPsico.value = 'No';
         formCheckSocial.value = 'Pendiente';
@@ -1386,6 +1482,9 @@
         document.getElementById('formEdad').value = item.edad_calculada || '';
         document.getElementById('formSexo').value = item.sexo;
         document.getElementById('formGradoSeccion').value = item.grado_seccion;
+
+        const formDocente = document.getElementById('formDocenteAsignado');
+        if (formDocente) formDocente.value = item.docente_id || '';
 
         document.getElementById('formCondicion').value = item.condicion;
         document.getElementById('formEstatusDiag').value = item.estatus_diagnostico;
@@ -1424,6 +1523,10 @@
         payload.atencion_psicologica = document.getElementById('formCheckPsico').value;
         payload.entrevista_social = document.getElementById('formCheckSocial').value;
         payload.informe_integral = document.getElementById('formCheckInforme').value;
+
+        // Docente asignado
+        const formDocente = document.getElementById('formDocenteAsignado');
+        payload.docente_id = (formDocente && formDocente.value) ? parseInt(formDocente.value, 10) : null;
 
         // Registrar por el id del usuario activo
         payload.registrado_por = currentUser ? currentUser.id : 1;
@@ -1574,6 +1677,7 @@
       // Inicialización
       loadInstituciones();
       loadCondiciones();
+      loadDocentesLista();
       loadStats();
       loadExpedientes();
     });

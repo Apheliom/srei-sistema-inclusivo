@@ -49,6 +49,7 @@ async function pullFromSupabase(db) {
     try {
       await client.query(`
         ALTER TABLE public.estudiantes ADD COLUMN IF NOT EXISTS activo SMALLINT NOT NULL DEFAULT 1;
+        ALTER TABLE public.estudiantes ADD COLUMN IF NOT EXISTS docente_id BIGINT;
         ALTER TABLE public.instituciones ADD COLUMN IF NOT EXISTS activo SMALLINT NOT NULL DEFAULT 1;
         ALTER TABLE public.condiciones_diagnosticas ADD COLUMN IF NOT EXISTS activo SMALLINT NOT NULL DEFAULT 1;
         CREATE TABLE IF NOT EXISTS public.bitacora (
@@ -95,17 +96,17 @@ async function pullFromSupabase(db) {
     }
 
     // 4. Estudiantes (Refleja eliminaciones de la nube en local)
-    const resEst = await client.query('SELECT id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, COALESCE(activo, 1) as activo, registrado_por FROM public.estudiantes ORDER BY id ASC');
+    const resEst = await client.query('SELECT id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, COALESCE(activo, 1) as activo, registrado_por, COALESCE(docente_id, registrado_por) as docente_id FROM public.estudiantes ORDER BY id ASC');
     if (resEst.rows.length > 0) {
       const supaEstIds = resEst.rows.map(e => e.id);
       db.prepare(`DELETE FROM estudiantes WHERE id NOT IN (${supaEstIds.join(',')})`).run();
       db.prepare(`DELETE FROM expedientes_medicos WHERE estudiante_id NOT IN (${supaEstIds.join(',')})`).run();
       db.prepare(`DELETE FROM representantes WHERE estudiante_id NOT IN (${supaEstIds.join(',')})`).run();
 
-      const estStmt = db.prepare('INSERT OR REPLACE INTO estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+      const estStmt = db.prepare('INSERT OR REPLACE INTO estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por, docente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
       for (const r of resEst.rows) {
         const fecha = r.fecha_nacimiento instanceof Date ? r.fecha_nacimiento.toISOString().split('T')[0] : r.fecha_nacimiento;
-        estStmt.run(r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, fecha, r.sexo, r.grado_seccion, r.activo, r.registrado_por);
+        estStmt.run(r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, fecha, r.sexo, r.grado_seccion, r.activo, r.registrado_por, r.docente_id);
       }
     }
 
@@ -161,9 +162,9 @@ async function syncTableToSupabase(tableName, db) {
         await client.query('DELETE FROM public.estudiantes');
         for (const r of rows) {
           await client.query(
-            `INSERT INTO public.estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-            [r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, r.fecha_nacimiento, r.sexo, r.grado_seccion, r.activo ?? 1, r.registrado_por]
+            `INSERT INTO public.estudiantes (id, institucion_id, numero_orden, nombres_apellidos, cedula_identidad, fecha_nacimiento, sexo, grado_seccion, activo, registrado_por, docente_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+            [r.id, r.institucion_id, r.numero_orden, r.nombres_apellidos, r.cedula_identidad, r.fecha_nacimiento, r.sexo, r.grado_seccion, r.activo ?? 1, r.registrado_por, r.docente_id || null]
           );
         }
       } else if (tableName === 'expedientes_medicos') {

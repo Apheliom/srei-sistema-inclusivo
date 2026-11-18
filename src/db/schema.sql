@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS estudiantes (
   grado_seccion TEXT NOT NULL,
   activo INTEGER NOT NULL DEFAULT 1,
   registrado_por INTEGER REFERENCES usuarios(id),
+  docente_id INTEGER REFERENCES usuarios(id),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -54,6 +55,7 @@ CREATE INDEX IF NOT EXISTS idx_estudiantes_cedula ON estudiantes(cedula_identida
 CREATE INDEX IF NOT EXISTS idx_estudiantes_institucion ON estudiantes(institucion_id);
 CREATE INDEX IF NOT EXISTS idx_estudiantes_grado ON estudiantes(grado_seccion);
 CREATE INDEX IF NOT EXISTS idx_estudiantes_registrado_por ON estudiantes(registrado_por);
+CREATE INDEX IF NOT EXISTS idx_estudiantes_docente_id ON estudiantes(docente_id);
 
 -- 4. Tabla de Expedientes Médicos y Diagnósticos (Bloques 2 y 4: Situación Especial y Checklist Digital)
 CREATE TABLE IF NOT EXISTS expedientes_medicos (

@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SREI - Sistema de Registro Estudiantil Inclusivo</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#1E3A8A',    /* Azul oscuro institucional */
+              blue: '#3B82F6',    /* Azul vibrante */
+              green: '#10B981',   /* Verde inclusiÃ³n */
+              light: '#F8FAFC',   /* Fondo claro */
+              dark: '#1F2937',    /* Texto oscuro */
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    /* Estilos de accesibilidad para modo alto contraste */
+    body.high-contrast {
+      background-color: #000000 !important;
+      color: #FFFFFF !important;
+    }
+    body.high-contrast .bg-white,
+    body.high-contrast .bg-slate-50,
+    body.high-contrast .bg-brand-light {
+      background-color: #121212 !important;
+      color: #FFFFFF !important;
+      border-color: #FFFFFF !important;
+    }
+    body.high-contrast .text-brand-navy,
+    body.high-contrast .text-brand-dark {
+      color: #FFFFFF !important;
+    }
+    body.high-contrast .text-slate-600,
+    body.high-contrast .text-slate-500 {
+      color: #E2E8F0 !important;
+    }
+    body.high-contrast .bg-background-themed {
+      opacity: 0.05 !important;
+    }
+    /* Estilo de escritura vertical para la pestaÃ±a lateral */
+    .vertical-writing-mode {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="bg-brand-light font-sans text-brand-dark min-h-screen flex flex-col relative antialiased selection:bg-brand-blue selection:text-white">
+<!-- 1. FONDO TRANSLÃšCIDO TEMÃTICO (Imagen de niÃ±os alcanzando estrellas) -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<img alt="" class="bg-background-themed w-full h-full object-cover object-center opacity-30 select-none filter blur-[0.3px]" src="https://lh3.googleusercontent.com/aida/ALJJyrAkIeRJLHRZB_s4LKGSBn9qOVX6Q6YwJH8l48dvdwXJ5EX2KWyCJMHsVNxzG7FVZnoRIlC0IsL_x1I_w_0mfT-04aEsLuBQ69KTaj7CKOiKsa-PSNirIqg345dcBpQM3GdsARblRbLjt3CENBucaOwgqHo4I48wKxkcYBedseWGxcYcwNhnTJT-lSgxtBEiCPwjG8euMJSA-nIlgPkzf-SCw_JRY-Ypj4vw6jir_dcw">
+<div class="absolute inset-0 bg-gradient-to-b from-brand-light/75 via-brand-light/60 to-brand-light/85 backdrop-blur-[1px]"></div>
+</div>
+<!-- 2. BARRA SUPERIOR: Fondo #1E3A8A, mensaje institucional y accesibilidad -->
+<header class="w-full bg-[#1E3A8A] text-white shadow-md z-40 sticky top-0"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between"><div class="flex items-center gap-3"><span aria-hidden="true" class="material-symbols-outlined text-[#10B981] text-2xl">school</span><h1 class="text-sm sm:text-base md:text-lg font-bold tracking-normal leading-tight text-white">Â¡Bienvenidos a la plataforma!</h1></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-[#10B981]">auto_awesome</span><span class="text-xs sm:text-sm md:text-base font-semibold tracking-wide text-white/95 uppercase tracking-wider">EducaciÃ³n Inclusiva</span></div></div></header>
+<!-- 4. BARRA VERTICAL CON BOTÃ“N "MÃS OPCIONES" -->
+<!-- Anclada en la parte superior derecha sin tapar el contenido central -->
+
+<!-- 3. ZONA CENTRAL DE LA PÃGINA (Centro de atenciÃ³n absoluto y protagonista) -->
+<main class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-14 text-center max-w-4xl mx-auto w-full relative z-10">
+<!-- Contenedor central del logotipo -->
+<div class="flex flex-col items-center justify-center w-full">
+<!-- Logotipo oficial SREI -->
+<div class="relative flex items-center justify-center mb-6 p-2 mx-auto"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWRWoD5nV_uj6fbydiz9MwuTx0KyFRvtQtweXgGlBBReyPJP7lWVuiG1AqUOD6F4VxpvFS2gz-KCOy3fi7Ok5Tt_B4AIYmYq_oGbscZCk1aY9Iz6XSznynS5ECk70gPUQirnhE73m-lETUlcQPACM2NCaa-kqHSU6hxeOi0xhqot9kOFiaPSSLtwwaRB9BZKkV6jWA-felJ2wH8bVhL57k-6Qc370ogIog_q6Mr-yFa-kIi6Spj_WW" alt="Logotipo EducaciÃ³n Inclusiva SREI" class="w-56 h-56 sm:w-64 sm:h-64 max-h-72 object-contain mix-blend-multiply select-none transition-transform hover:scale-105 duration-300"></div>
+<!-- Frase clave y contenido destacado -->
+<div class="flex flex-col items-center max-w-2xl px-2">
+<h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1E3A8A] tracking-tight leading-tight">
+        â€œSer especial, es algo diferenteâ€
+      </h2>
+<p class="mt-3.5 text-base sm:text-lg text-[#1F2937]/85 font-medium leading-relaxed max-w-xl">
+        Sistema de Registro Estudiantil Inclusivo (SREI).&nbsp;</p><div class="">Construyendo un camino equitativo donde cada estudiante puede brillar con luz propia.
+      </div><p class=""></p>
+<!-- Botones de acciÃ³n solicitados -->
+<div class="mt-8 flex flex-wrap items-center justify-center gap-4"><a href="#registrarse" class="inline-flex items-center justify-center gap-3 bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-lg sm:text-xl px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 tracking-wide"><span class="material-symbols-outlined text-2xl sm:text-3xl">person_add</span><span class="">Registrarse</span></a></div>
+</div>
+</div>
+</main>
+<!-- 5. PIE DE PÃGINA: Limpio, minimalista y con el copyright solicitado -->
+<footer class="w-full bg-white/95 backdrop-blur-sm border-t border-slate-200/90 py-4 px-4 text-center text-xs text-[#1F2937]/75 relative z-10"><div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2"><p class="font-medium text-xs sm:text-sm text-[#1F2937]/85">Â© 2025 SREI â€¢ Todos los derechos reservados â€¢ <span class="text-[#10B981] font-semibold">EducaciÃ³n Inclusiva</span></p></div></footer>
+<!-- 6. LÃ“GICA INTERACTIVA ACCESIBLE (JavaScript) -->
+<script>
+  (function () {
+    const optionsBtn = document.getElementById('optionsBtn');
+    const optionsPanel = document.getElementById('optionsPanel');
+    const closePanelBtn = document.getElementById('closePanelBtn');
+    const optionsChevron = document.getElementById('optionsChevron');
+
+    function togglePanel() {
+      const isHidden = optionsPanel.classList.contains('hidden');
+      if (isHidden) {
+        optionsPanel.classList.remove('hidden');
+        optionsBtn.setAttribute('aria-expanded', 'true');
+        if (optionsChevron) optionsChevron.style.transform = 'rotate(180deg)';
+      } else {
+        optionsPanel.classList.add('hidden');
+        optionsBtn.setAttribute('aria-expanded', 'false');
+        if (optionsChevron) optionsChevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    if (optionsBtn) {
+      optionsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        togglePanel();
+      });
+    }
+
+    if (closePanelBtn) {
+      closePanelBtn.addEventListener('click', function () {
+        optionsPanel.classList.add('hidden');
+        optionsBtn.setAttribute('aria-expanded', 'false');
+        if (optionsChevron) optionsChevron.style.transform = 'rotate(0deg)';
+      });
+    }
+
+    // Cerrar al hacer clic fuera del panel
+    document.addEventListener('click', function (event) {
+      if (!optionsPanel.contains(event.target) && !optionsBtn.contains(event.target)) {
+        if (!optionsPanel.classList.contains('hidden')) {
+          optionsPanel.classList.add('hidden');
+          optionsBtn.setAttribute('aria-expanded', 'false');
+          if (optionsChevron) optionsChevron.style.transform = 'rotate(0deg)';
+        }
+      }
+    });
+
+    // Controles de tamaÃ±o de texto
+    let fontScale = 100;
+    const fontInc = document.getElementById('fontInc');
+    const fontDec = document.getElementById('fontDec');
+    const fontReset = document.getElementById('fontReset');
+
+    if (fontInc) {
+      fontInc.addEventListener('click', function () {
+        if (fontScale < 130) {
+          fontScale += 10;
+          document.documentElement.style.fontSize = (fontScale / 100 * 16) + 'px';
+        }
+      });
+    }
+
+    if (fontDec) {
+      fontDec.addEventListener('click', function () {
+        if (fontScale > 80) {
+          fontScale -= 10;
+          document.documentElement.style.fontSize = (fontScale / 100 * 16) + 'px';
+        }
+      });
+    }
+
+    if (fontReset) {
+      fontReset.addEventListener('click', function () {
+        fontScale = 100;
+        document.documentElement.style.fontSize = '16px';
+      });
+    }
+
+    // Modo Alto Contraste
+    const contrastBtn = document.getElementById('contrastBtn');
+    const contrastStatus = document.getElementById('contrastStatus');
+    let highContrastActive = false;
+
+    if (contrastBtn) {
+      contrastBtn.addEventListener('click', function () {
+        highContrastActive = !highContrastActive;
+        if (highContrastActive) {
+          document.body.classList.add('high-contrast');
+          if (contrastStatus) {
+            contrastStatus.textContent = 'Activado';
+            contrastStatus.className = 'text-[10px] uppercase font-bold bg-[#10B981] text-white px-2 py-0.5 rounded';
+          }
+        } else {
+          document.body.classList.remove('high-contrast');
+          if (contrastStatus) {
+            contrastStatus.textContent = 'Desactivado';
+            contrastStatus.className = 'text-[10px] uppercase font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded';
+          }
+        }
+      });
+    }
+  })();
+</script>
+
+
+
+
+
+
+
+
+</body></html>

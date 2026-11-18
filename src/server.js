@@ -360,7 +360,7 @@ app.put('/api/usuarios/perfil', async (req, res) => {
 // Listar expedientes estudiantiles con filtros y búsqueda (Soporta borrado lógico)
 app.get('/api/expedientes', (req, res) => {
   try {
-    const { search, institucion_id, condicion, grado_seccion, estatus_diagnostico, estado } = req.query;
+    const { search, institucion_id, condicion, grado_seccion, estatus_diagnostico, estado, docente_id } = req.query;
 
     let sql = `
       SELECT 
@@ -376,6 +376,9 @@ app.get('/api/expedientes', (req, res) => {
         e.grado_seccion,
         e.activo,
         e.registrado_por,
+        e.docente_id,
+        u.nombre_completo AS docente_nombre,
+        u.email AS docente_email,
         e.created_at,
         m.condicion,
         m.estatus_diagnostico,
@@ -391,6 +394,7 @@ app.get('/api/expedientes', (req, res) => {
         r.parentesco
       FROM estudiantes e
       JOIN instituciones i ON e.institucion_id = i.id
+      LEFT JOIN usuarios u ON e.docente_id = u.id
       LEFT JOIN expedientes_medicos m ON e.id = m.estudiante_id
       LEFT JOIN representantes r ON e.id = r.estudiante_id
       WHERE 1=1
@@ -433,6 +437,14 @@ app.get('/api/expedientes', (req, res) => {
       params.push(estatus_diagnostico);
     }
 
+    // Filtro por Docente Asignado
+    if (docente_id === 'sin_asignar') {
+      sql += ` AND (e.docente_id IS NULL OR e.docente_id = 0)`;
+    } else if (docente_id) {
+      sql += ` AND e.docente_id = ?`;
+      params.push(docente_id);
+    }
+
     sql += ` ORDER BY e.id DESC`;
 
     const rows = db.prepare(sql).all(...params);
@@ -449,18 +461,35 @@ app.get('/api/expedientes', (req, res) => {
   }
 });
 
+// Lista de Docentes para Asignación y Filtros (Profesores activos + Directora)
+app.get('/api/docentes-lista', (req, res) => {
+  try {
+    const list = db.prepare(`
+      SELECT id, email, nombre_completo, rol, estado 
+      FROM usuarios 
+      WHERE (rol = 'profesor' OR rol = 'admin') AND estado = 'activo'
+      ORDER BY rol ASC, nombre_completo ASC
+    `).all();
+    res.json({ success: true, count: list.length, data: list });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Obtener un expediente completo por ID
 app.get('/api/expedientes/:id', (req, res) => {
   try {
     const sql = `
       SELECT 
         e.*, i.nombre_institucion,
+        u.nombre_completo AS docente_nombre, u.email AS docente_email,
         m.condicion, m.estatus_diagnostico, m.observaciones,
         m.atencion_psicologica, m.entrevista_social, m.informe_integral,
         m.toma_medicamento, m.medicamento_detalles,
         r.nombre_representante, r.cedula_representante, r.telefono, r.parentesco
       FROM estudiantes e
       JOIN instituciones i ON e.institucion_id = i.id
+      LEFT JOIN usuarios u ON e.docente_id = u.id
       LEFT JOIN expedientes_medicos m ON e.id = m.estudiante_id
       LEFT JOIN representantes r ON e.id = r.estudiante_id
       WHERE e.id = ?
@@ -504,7 +533,7 @@ app.post('/api/expedientes', (req, res) => {
   try {
     let {
       institucion_id, numero_orden, nombres_apellidos, cedula_identidad,
-      fecha_nacimiento, edad, sexo, grado_seccion, registrado_por,
+      fecha_nacimiento, edad, sexo, grado_seccion, registrado_por, docente_id,
       condicion, estatus_diagnostico, observaciones,
       atencion_psicologica, entrevista_social, informe_integral,
       toma_medicamento, medicamento_detalles,
@@ -514,6 +543,10 @@ app.post('/api/expedientes', (req, res) => {
     if (!institucion_id || !nombres_apellidos || !grado_seccion || !condicion) {
       return res.status(400).json({ success: false, error: 'Institución, nombres, grado y condición diagnóstica son obligatorios.' });
     }
+
+    const docIdNormalizado = (docente_id && String(docente_id).trim() !== '' && String(docente_id) !== 'sin_asignar' && String(docente_id) !== '0')
+      ? parseInt(docente_id, 10)
+      : null;
 
     // Normalizar Cédula (si no posee, generar correlativo escolar editable)
     let cedulaLimpia = (cedula_identidad && cedula_identidad.trim()) 
@@ -547,11 +580,11 @@ app.post('/api/expedientes', (req, res) => {
         db.prepare(`
           UPDATE estudiantes SET
             institucion_id = ?, numero_orden = ?, nombres_apellidos = ?,
-            fecha_nacimiento = ?, sexo = ?, grado_seccion = ?, activo = 1
+            fecha_nacimiento = ?, sexo = ?, grado_seccion = ?, docente_id = ?, activo = 1
           WHERE id = ?
         `).run(
           institucion_id, numero_orden || null, nombres_apellidos.trim(),
-          fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), estId
+          fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), docIdNormalizado, estId
         );
         db.prepare('DELETE FROM expedientes_medicos WHERE estudiante_id = ?').run(estId);
         db.prepare('DELETE FROM representantes WHERE estudiante_id = ?').run(estId);
@@ -559,11 +592,11 @@ app.post('/api/expedientes', (req, res) => {
         const resEst = db.prepare(`
           INSERT INTO estudiantes (
             institucion_id, numero_orden, nombres_apellidos, cedula_identidad,
-            fecha_nacimiento, sexo, grado_seccion, activo, registrado_por
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)
+            fecha_nacimiento, sexo, grado_seccion, activo, registrado_por, docente_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
         `).run(
           institucion_id, numero_orden || null, nombres_apellidos.trim(), cedulaLimpia,
-          fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), registrado_por || 1
+          fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), registrado_por || 1, docIdNormalizado
         );
         estId = resEst.lastInsertRowid;
       }
@@ -621,7 +654,7 @@ app.put('/api/expedientes/:id', (req, res) => {
     const estId = req.params.id;
     let {
       institucion_id, numero_orden, nombres_apellidos, cedula_identidad,
-      fecha_nacimiento, edad, sexo, grado_seccion,
+      fecha_nacimiento, edad, sexo, grado_seccion, docente_id,
       condicion, estatus_diagnostico, observaciones,
       atencion_psicologica, entrevista_social, informe_integral,
       toma_medicamento, medicamento_detalles,
@@ -631,6 +664,10 @@ app.put('/api/expedientes/:id', (req, res) => {
     if (!institucion_id || !nombres_apellidos || !grado_seccion || !condicion) {
       return res.status(400).json({ success: false, error: 'Institución, nombres, grado y condición diagnóstica son obligatorios.' });
     }
+
+    const docIdNormalizado = (docente_id && String(docente_id).trim() !== '' && String(docente_id) !== 'sin_asignar' && String(docente_id) !== '0')
+      ? parseInt(docente_id, 10)
+      : null;
 
     let cedulaLimpia = (cedula_identidad && cedula_identidad.trim())
       ? cedula_identidad.trim().toUpperCase()
@@ -653,11 +690,11 @@ app.put('/api/expedientes/:id', (req, res) => {
       db.prepare(`
         UPDATE estudiantes SET
           institucion_id = ?, numero_orden = ?, nombres_apellidos = ?,
-          cedula_identidad = ?, fecha_nacimiento = ?, sexo = ?, grado_seccion = ?
+          cedula_identidad = ?, fecha_nacimiento = ?, sexo = ?, grado_seccion = ?, docente_id = ?
         WHERE id = ?
       `).run(
         institucion_id, numero_orden || null, nombres_apellidos.trim(),
-        cedulaLimpia, fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), estId
+        cedulaLimpia, fecha_nacimiento, sexoNormalizado, grado_seccion.trim(), docIdNormalizado, estId
       );
 
       db.prepare(`
@@ -841,6 +878,58 @@ app.delete('/api/admin/profesores/:id', (req, res) => {
   }
 });
 
+// Modificar datos del Docente por el Administrador (Nombre, Correo, Clave, Estado)
+app.put('/api/admin/profesores/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre_completo, email, password, estado } = req.body;
+
+    if (parseInt(id, 10) === 1) {
+      return res.status(403).json({ success: false, error: 'La cuenta principal de la Directora se administra desde el Perfil.' });
+    }
+
+    const existing = db.prepare('SELECT id, nombre_completo, email, estado FROM usuarios WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, error: 'Docente no encontrado.' });
+    }
+
+    if (email && email.toLowerCase().trim() !== existing.email.toLowerCase().trim()) {
+      const emailDup = db.prepare('SELECT id FROM usuarios WHERE LOWER(email) = ? AND id != ?').get(email.toLowerCase().trim(), id);
+      if (emailDup) {
+        return res.status(409).json({ success: false, error: 'Ya existe otro docente registrado con ese correo electrónico.' });
+      }
+    }
+
+    const nuevoNombre = (nombre_completo && nombre_completo.trim()) ? nombre_completo.trim() : existing.nombre_completo;
+    const nuevoEmail = (email && email.trim()) ? email.toLowerCase().trim() : existing.email;
+    const nuevoEstado = (estado && ['activo', 'pendiente', 'inactivo'].includes(estado)) ? estado : existing.estado;
+
+    if (password && password.trim().length >= 6) {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(password.trim(), salt);
+      db.prepare(`
+        UPDATE usuarios 
+        SET nombre_completo = ?, email = ?, password_hash = ?, estado = ?
+        WHERE id = ?
+      `).run(nuevoNombre, nuevoEmail, hash, nuevoEstado, id);
+    } else {
+      db.prepare(`
+        UPDATE usuarios 
+        SET nombre_completo = ?, email = ?, estado = ?
+        WHERE id = ?
+      `).run(nuevoNombre, nuevoEmail, nuevoEstado, id);
+    }
+
+    syncUsersToSupabase(db);
+
+    registrarBitacora(req, 'EDITAR_DOCENTE', 'DOCENTES', `Datos de docente ID ${id} actualizados: ${nuevoNombre} (${nuevoEmail}) [Estado: ${nuevoEstado}]${password && password.trim() ? ' - Clave restablecida' : ''}`, db);
+
+    res.json({ success: true, message: 'Datos del docente actualizados correctamente.' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ====================================================================
 // BITÁCORA INSTITUCIONAL DE AUDITORÍA (EXCLUSIVO DIRECTORA / MAGISTER AMPARO AGUILAR)
 // ====================================================================
@@ -899,11 +988,12 @@ app.get('/api/admin/bitacora', (req, res) => {
   }
 });
 
-// Exportar a Supabase / PostgreSQL
+// Exportar a Supabase / PostgreSQL (Respaldo relacional en vivo exclusivo Directora)
 app.get('/api/export/supabase', (req, res) => {
   try {
     const { outputPath } = generateSupabaseSQL();
-    res.download(outputPath, 'srei_supabase_export.sql');
+    registrarBitacora(req, 'DESCARGA_RESPALDO_SQL', 'SISTEMA', 'Descarga de respaldo SQL vivo con datos actuales de todas las tablas', db);
+    res.download(outputPath, 'srei_supabase_respaldo_vivo.sql');
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

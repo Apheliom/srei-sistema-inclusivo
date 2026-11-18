@@ -18,20 +18,40 @@ try {
   if (isOldSchema) {
     db.exec('DROP TABLE IF EXISTS estudiantes;');
     console.log('[DB Migration] Migrando esquema preliminar hacia estructura relacional normalizada de 4 bloques.');
+  } else if (info.length > 0) {
+    // Si la tabla ya existe, asegurar columnas antes de ejecutar índices de schema.sql
+    if (!info.some(c => c.name === 'activo')) {
+      db.exec("ALTER TABLE estudiantes ADD COLUMN activo INTEGER NOT NULL DEFAULT 1;");
+    }
+    if (!info.some(c => c.name === 'docente_id')) {
+      db.exec("ALTER TABLE estudiantes ADD COLUMN docente_id INTEGER REFERENCES usuarios(id);");
+      db.exec("UPDATE estudiantes SET docente_id = registrado_por WHERE docente_id IS NULL AND registrado_por IS NOT NULL;");
+    }
   }
 } catch (e) {
   // Sin tablas previas
 }
 
+try {
+  const infoInst = db.prepare("PRAGMA table_info(instituciones)").all();
+  if (infoInst.length > 0 && !infoInst.some(c => c.name === 'activo')) {
+    db.exec("ALTER TABLE instituciones ADD COLUMN activo INTEGER NOT NULL DEFAULT 1;");
+  }
+} catch (e) {}
+
 // Inicializar esquema relacional completo
 const schema = fs.readFileSync(schemaPath, 'utf8');
 db.exec(schema);
 
-// Migración de borrado lógico (columna activo)
+// Migración de borrado lógico (columna activo) y docente asignado (columna docente_id)
 try {
   const infoEst = db.prepare("PRAGMA table_info(estudiantes)").all();
   if (!infoEst.some(c => c.name === 'activo')) {
     db.exec("ALTER TABLE estudiantes ADD COLUMN activo INTEGER NOT NULL DEFAULT 1;");
+  }
+  if (!infoEst.some(c => c.name === 'docente_id')) {
+    db.exec("ALTER TABLE estudiantes ADD COLUMN docente_id INTEGER REFERENCES usuarios(id);");
+    db.exec("UPDATE estudiantes SET docente_id = registrado_por WHERE docente_id IS NULL AND registrado_por IS NOT NULL;");
   }
 } catch (e) {}
 

@@ -205,6 +205,57 @@
       </div>
     </section>
 
+    <!-- Modal Editar Datos del Docente -->
+    <div id="modalEditarDocente" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div class="bg-[#1E3A8A] text-white px-5 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl text-[#10B981]">manage_accounts</span>
+            <h3 class="font-bold text-sm sm:text-base">Editar Datos del Docente</h3>
+          </div>
+          <button id="btnCerrarModalEditar" type="button" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 cursor-pointer">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <form id="formEditarDocente" class="p-5 flex flex-col gap-4 text-xs sm:text-sm">
+          <input type="hidden" id="editDocenteId">
+          
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nombre Completo *</label>
+            <input type="text" id="editDocenteNombre" required class="w-full text-xs sm:text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Correo Electrónico *</label>
+            <input type="email" id="editDocenteEmail" required class="w-full text-xs sm:text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nueva Contraseña <span class="font-normal text-slate-400">(Opcional)</span></label>
+            <input type="password" id="editDocentePassword" placeholder="Dejar en blanco para conservar la actual" minlength="6" class="w-full text-xs sm:text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+            <span class="text-[11px] text-slate-400 mt-0.5 block">Mínimo 6 caracteres si deseas restablecer la contraseña.</span>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Estado de Acceso</label>
+            <select id="editDocenteEstado" class="w-full text-xs sm:text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]">
+              <option value="activo">Activo (Acceso Autorizado)</option>
+              <option value="pendiente">Pendiente de Aprobación</option>
+              <option value="inactivo">Inactivo / Bloqueado</option>
+            </select>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" id="btnCancelarEditar" class="px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl font-semibold transition-colors cursor-pointer">Cancelar</button>
+            <button type="submit" id="btnGuardarEditarDocente" class="px-4 py-2 bg-[#1E3A8A] hover:bg-blue-900 text-white rounded-xl font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-base">save</span> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </main>
 
   <footer class="w-full bg-white border-t border-slate-200/80 py-3 px-4 text-center text-xs text-slate-500 mt-auto">
@@ -283,8 +334,8 @@
         // Móvil
         mobileDocentesContainer.innerHTML = list.map(t => {
           const btn = t.estado === 'activo'
-            ? `<button onclick="cambiarEstadoDocente(${t.id}, 'inactivo')" class="flex-1 py-1.5 px-3 text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg">Desactivar Acceso</button>`
-            : `<button onclick="cambiarEstadoDocente(${t.id}, 'activo')" class="flex-1 py-1.5 px-3 text-xs font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-lg shadow-xs">✓ Aprobar Cuenta</button>`;
+            ? `<button onclick="cambiarEstadoDocente(${t.id}, 'inactivo')" class="flex-1 py-1.5 px-3 text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg">Desactivar</button>`
+            : `<button onclick="cambiarEstadoDocente(${t.id}, 'activo')" class="flex-1 py-1.5 px-3 text-xs font-bold bg-[#10B981] hover:bg-emerald-600 text-white rounded-lg shadow-xs">✓ Aprobar</button>`;
 
           return `
             <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col gap-2">
@@ -297,7 +348,10 @@
               </div>
               <div class="pt-2 border-t border-slate-100 mt-1 flex items-center gap-2">
                 ${btn}
-                <button onclick="eliminarDocente(${t.id}, '${escapeHtml(t.nombre_completo)}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200" title="Eliminar docente">
+                <button onclick="abrirModalEditarDocente(${t.id})" class="p-1.5 text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors" title="Editar cuenta">
+                  <span class="material-symbols-outlined text-base">edit</span>
+                </button>
+                <button onclick="eliminarDocente(${t.id}, '${escapeHtml(t.nombre_completo)}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200 transition-colors" title="Eliminar docente">
                   <span class="material-symbols-outlined text-base">delete</span>
                 </button>
               </div>
@@ -319,6 +373,9 @@
               <td class="py-3 px-4 text-center">
                 <div class="inline-flex items-center gap-2">
                   ${btn}
+                  <button onclick="abrirModalEditarDocente(${t.id})" class="p-1.5 text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors" title="Editar datos del docente">
+                    <span class="material-symbols-outlined text-base">edit</span>
+                  </button>
                   <button onclick="eliminarDocente(${t.id}, '${escapeHtml(t.nombre_completo)}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200 transition-colors" title="Eliminar definitivamente">
                     <span class="material-symbols-outlined text-base">delete</span>
                   </button>
@@ -371,6 +428,66 @@
           alert('Error al procesar eliminación: ' + e.message);
         }
       };
+
+      const modalEditarDocente = document.getElementById('modalEditarDocente');
+      const formEditarDocente = document.getElementById('formEditarDocente');
+      const editDocenteId = document.getElementById('editDocenteId');
+      const editDocenteNombre = document.getElementById('editDocenteNombre');
+      const editDocenteEmail = document.getElementById('editDocenteEmail');
+      const editDocentePassword = document.getElementById('editDocentePassword');
+      const editDocenteEstado = document.getElementById('editDocenteEstado');
+
+      function cerrarModalEditar() {
+        modalEditarDocente.classList.add('hidden');
+        formEditarDocente.reset();
+      }
+
+      document.getElementById('btnCerrarModalEditar').addEventListener('click', cerrarModalEditar);
+      document.getElementById('btnCancelarEditar').addEventListener('click', cerrarModalEditar);
+
+      window.abrirModalEditarDocente = function(id) {
+        const docente = docentesList.find(d => d.id === id);
+        if (!docente) return;
+        editDocenteId.value = docente.id;
+        editDocenteNombre.value = docente.nombre_completo;
+        editDocenteEmail.value = docente.email;
+        editDocentePassword.value = '';
+        editDocenteEstado.value = docente.estado || 'activo';
+        modalEditarDocente.classList.remove('hidden');
+      };
+
+      formEditarDocente.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = editDocenteId.value;
+        const nombre_completo = editDocenteNombre.value.trim();
+        const email = editDocenteEmail.value.trim();
+        const password = editDocentePassword.value.trim();
+        const estado = editDocenteEstado.value;
+
+        if (!nombre_completo || !email) {
+          alert('Nombre y correo son requeridos.');
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/admin/profesores/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre_completo, email, password: password || undefined, estado })
+          });
+          const json = await res.json();
+          if (json.success) {
+            alert(json.message);
+            cerrarModalEditar();
+            loadDocentes();
+            loadStats();
+          } else {
+            alert(json.error || 'Error al actualizar docente.');
+          }
+        } catch (err) {
+          alert('Error de conexión al actualizar datos: ' + err.message);
+        }
+      });
 
       function escapeHtml(str) {
         if (!str) return '';

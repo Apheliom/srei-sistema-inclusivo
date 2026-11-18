@@ -162,10 +162,8 @@
         &copy; 2025 SREI &bull; Todos los derechos reservados &bull; <strong class="text-[#10B981]">Educación
           Inclusiva</strong>
       </p>
-      <div class="flex items-center gap-3 text-[11px]">
-        <button id="btnFooterExport" class="text-[#1E3A8A] font-semibold hover:underline flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs text-emerald-600">database</span> Exportar a Supabase (.sql)
-        </button>
+      <div class="text-[11px] text-slate-400">
+        Plataforma Escolar de Inclusión y Diversidad
       </div>
     </div>
   </footer>
@@ -247,10 +245,6 @@
         }
       }
       loadStats();
-
-      document.getElementById('btnFooterExport').addEventListener('click', () => {
-        window.location.href = '/api/export/supabase';
-      });
 
       function escapeHtml(str) {
         if (!str) return '';
